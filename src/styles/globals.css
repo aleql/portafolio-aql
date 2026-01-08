@@ -1,0 +1,191 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-gray-50 text-gray-900 font-sans antialiased transition-colors duration-300;
+  }
+
+  .dark body {
+    background-color: #050814;
+    color: rgb(243 244 246);
+    background-image:
+      linear-gradient(rgba(0, 240, 255, 0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0, 240, 255, 0.03) 1px, transparent 1px);
+    background-size: 50px 50px;
+  }
+
+  * {
+    @apply border-gray-200;
+  }
+
+  .dark * {
+    border-color: #1e2a5e;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .text-glow {
+    text-shadow: 0 0 10px currentColor, 0 0 20px currentColor, 0 0 30px currentColor;
+  }
+
+  .text-glow-lg {
+    text-shadow: 0 0 10px currentColor, 0 0 30px currentColor, 0 0 50px currentColor, 0 0 80px currentColor;
+  }
+
+  .border-glow {
+    box-shadow: 0 0 5px currentColor, inset 0 0 5px currentColor;
+  }
+
+  .grid-bg {
+    background-image:
+      linear-gradient(rgba(0, 240, 255, 0.1) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0, 240, 255, 0.1) 1px, transparent 1px);
+    background-size: 30px 30px;
+  }
+
+  /* Scanlines effect */
+  .scanlines {
+    position: relative;
+  }
+
+  .scanlines::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      transparent 50%,
+      rgba(0, 240, 255, 0.03) 50%
+    );
+    background-size: 100% 4px;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  /* CRT glow effect */
+  .crt-glow {
+    position: relative;
+  }
+
+  .crt-glow::after {
+    content: '';
+    position: absolute;
+    inset: -20px;
+    background: radial-gradient(
+      ellipse at center,
+      rgba(0, 240, 255, 0.1) 0%,
+      transparent 70%
+    );
+    pointer-events: none;
+    z-index: -1;
+  }
+
+  /* Hexagonal pattern */
+  .hex-pattern {
+    background-image:
+      radial-gradient(circle at 50% 50%, rgba(0, 240, 255, 0.1) 1px, transparent 1px),
+      radial-gradient(circle at 0% 100%, rgba(255, 0, 255, 0.1) 1px, transparent 1px);
+    background-size: 40px 40px;
+    background-position: 0 0, 20px 20px;
+  }
+
+  /* Pulse animation for elements */
+  .pulse-border {
+    animation: pulseBorder 2s ease-in-out infinite;
+  }
+
+  @keyframes pulseBorder {
+    0%, 100% {
+      box-shadow: 0 0 5px rgba(0, 240, 255, 0.5),
+                  0 0 10px rgba(0, 240, 255, 0.3),
+                  inset 0 0 5px rgba(0, 240, 255, 0.2);
+    }
+    50% {
+      box-shadow: 0 0 20px rgba(0, 240, 255, 0.8),
+                  0 0 30px rgba(0, 240, 255, 0.5),
+                  inset 0 0 10px rgba(0, 240, 255, 0.4);
+    }
+  }
+
+  /* Corner decorations */
+  .corner-cut {
+    clip-path: polygon(
+      8px 0, 100% 0, 100% calc(100% - 8px),
+      calc(100% - 8px) 100%, 0 100%, 0 8px
+    );
+  }
+
+  .corner-brackets::before,
+  .corner-brackets::after {
+    content: '';
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    border: 2px solid currentColor;
+  }
+
+  .corner-brackets::before {
+    top: -2px;
+    left: -2px;
+    border-right: none;
+    border-bottom: none;
+  }
+
+  .corner-brackets::after {
+    bottom: -2px;
+    right: -2px;
+    border-left: none;
+    border-top: none;
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-gray-100;
+}
+
+.dark ::-webkit-scrollbar-track {
+  background-color: #0a0e27;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-primary-400 rounded-full;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background-color: #00f0ff;
+  box-shadow: 0 0 10px rgba(0, 240, 255, 0.5);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-primary-600;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background-color: #1affff;
+  box-shadow: 0 0 20px rgba(0, 240, 255, 0.8);
+}
+
+/* Selection */
+::selection {
+  @apply bg-primary-500 text-white;
+}
+
+.dark ::selection {
+  background: rgba(0, 240, 255, 0.3);
+  color: #00f0ff;
+}
