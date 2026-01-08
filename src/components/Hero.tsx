@@ -106,10 +106,10 @@ export default function Hero() {
               animate={{ rotate: 360 }}
               transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
             >
-              <Box size={16} />
+              <Box size={20} />
             </motion.div>
             <span className="uppercase tracking-wider">10+ Years • Full-Stack • Backend • Game Dev</span>
-            <div className="absolute top-0 right-0 w-2 h-2 bg-neon-green rounded-full animate-pulse" />
+            <div className="absolute top-0 right-0 w-2 h-4 bg-neon-green rounded-full animate-pulse" />
           </motion.div>
 
           {/* Name with intense glitch and glow effect */}
@@ -271,8 +271,9 @@ export default function Hero() {
             </motion.button>
 
             <motion.a
-              href="/cv.pdf"
-              download="CV.pdf"
+              href="https://github.com/aleql/portafolio-aql/blob/main/public/cv.pdf"
+              target="_blank"
+              rel="noopener noreferrer"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               className="relative px-10 py-4 font-semibold font-mono uppercase tracking-wider group corner-cut"
