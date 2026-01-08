@@ -5,7 +5,7 @@
 **Full-Stack Engineer | Backend Engineer | HCI Researcher | Game Developer**
 
 📧 [alejandroquijadaleyton@gmail.com](mailto:alejandroquijadaleyton@gmail.com)
-🔗 [LinkedIn](https://www.linkedin.com/in/alejandro-quijada-leyton-b364b5235/)
+🔗 [LinkedIn](https://www.linkedin.com/in/alejandro-quijada-b364b5235/)
 💻 [GitHub](https://github.com/aleql)
 🌐 [Portfolio](https://eye-search.ucl.ac.uk)
 

@@ -61,7 +61,7 @@ export const personalInfo: PersonalInfo = {
     "Game Developer"
   ],
   email: "alejandroquijadaleyton@gmail.com",
-  linkedin: "https://www.linkedin.com/in/alejandro-quijada-leyton-b364b5235/",
+  linkedin: "https://www.linkedin.com/in/alejandro-quijada-b364b5235/",
   github: "https://github.com/aleql",
   portfolio: "https://eye-search.ucl.ac.uk"
 };

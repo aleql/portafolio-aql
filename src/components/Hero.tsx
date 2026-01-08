@@ -271,8 +271,8 @@ export default function Hero() {
             </motion.button>
 
             <motion.a
-              href="/cv.md"
-              download
+              href="/cv.pdf"
+              download="CV.pdf"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               className="relative px-10 py-4 font-semibold font-mono uppercase tracking-wider group corner-cut"

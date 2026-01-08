@@ -170,7 +170,7 @@ MIT License - feel free to use this template for your own portfolio!
 
 **Alejandro Quijada Leyton**
 - Email: alejandroquijadaleyton@gmail.com
-- LinkedIn: [linkedin.com/in/alejandro-quijada-leyton-b364b5235](https://www.linkedin.com/in/alejandro-quijada-leyton-b364b5235/)
+- LinkedIn: [linkedin.com/in/alejandro-quijada-leyton-b364b5235](https://www.linkedin.com/in/alejandro-quijada-b364b5235/)
 - GitHub: [github.com/aleql](https://github.com/aleql)
 - Portfolio: [eye-search.ucl.ac.uk](https://eye-search.ucl.ac.uk)
 
