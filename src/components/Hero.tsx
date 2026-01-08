@@ -94,23 +94,9 @@ export default function Hero() {
       </div>
 
       <div className="container mx-auto px-4 max-w-7xl relative z-10 crt-glow">
-        <div className="text-center">
+        <div className="text-center pt-20 md:pt-24">
           {/* Tech indicator badge */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-            className="inline-flex items-center gap-3 mb-8 px-6 py-3 bg-primary-500/10 dark:bg-primary-500/20 border-2 border-primary-500 dark:border-primary-400 rounded-sm text-primary-700 dark:text-primary-400 font-mono text-sm backdrop-blur-sm relative corner-cut"
-          >
-            <motion.div
-              animate={{ rotate: 360 }}
-              transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
-            >
-              <Box size={20} />
-            </motion.div>
-            <span className="uppercase tracking-wider">10+ Years • Full-Stack • Backend • Game Dev</span>
-            <div className="absolute top-0 right-0 w-2 h-4 bg-neon-green rounded-full animate-pulse" />
-          </motion.div>
+
 
           {/* Name with intense glitch and glow effect */}
           <motion.div
@@ -271,7 +257,7 @@ export default function Hero() {
             </motion.button>
 
             <motion.a
-              href="https://github.com/aleql/portafolio-aql/blob/main/public/cv.pdf"
+              href="https://raw.githubusercontent.com/aleql/portafolio-aql/main/public/cv.pdf"
               target="_blank"
               rel="noopener noreferrer"
               whileHover={{ scale: 1.05 }}
