@@ -23,18 +23,34 @@ export default function Education() {
           <GraduationCap className="text-primary-600 dark:text-primary-400" />
           Education
         </motion.h3>
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid md:grid-cols-1 gap-6">
           {education.map((edu, index) => (
             <Card key={index} delay={index * 0.1}>
               <div className="mb-3">
-                <h4 className="text-lg font-bold font-game text-gray-900 dark:text-white mb-1">{edu.degree}</h4>
+                <h4 className="text-xl font-bold font-game text-gray-900 dark:text-white mb-1">{edu.degree}</h4>
                 <p className="text-primary-600 dark:text-primary-400 font-medium">{edu.institution}</p>
                 <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">{edu.period}</p>
               </div>
               {edu.honors && (
-                <div className="flex items-center gap-2 text-sm text-accent-600 dark:text-accent-400">
+                <div className="flex items-center gap-2 text-sm text-accent-600 dark:text-accent-400 mb-3">
                   <Award size={16} />
                   <span>{edu.honors}</span>
+                </div>
+              )}
+              {edu.description && (
+                <p className="text-gray-700 dark:text-gray-300 mb-3">{edu.description}</p>
+              )}
+              {edu.focus && edu.focus.length > 0 && (
+                <div className="mt-3">
+                  <h5 className="text-sm font-semibold text-gray-900 dark:text-white mb-2">Academic Focus:</h5>
+                  <ul className="space-y-1">
+                    {edu.focus.map((item, i) => (
+                      <li key={i} className="text-gray-700 dark:text-gray-300 text-sm flex gap-2">
+                        <span className="text-primary-600 dark:text-primary-400">•</span>
+                        <span>{item}</span>
+                      </li>
+                    ))}
+                  </ul>
                 </div>
               )}
             </Card>

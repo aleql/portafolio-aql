@@ -37,6 +37,8 @@ export interface Education {
   institution: string;
   period: string;
   honors?: string;
+  description?: string;
+  focus?: string[];
 }
 
 export interface Skill {
@@ -63,7 +65,7 @@ export const personalInfo: PersonalInfo = {
   email: "alejandroquijadaleyton@gmail.com",
   linkedin: "https://www.linkedin.com/in/alejandro-quijada-b364b5235/",
   github: "https://github.com/aleql",
-  portfolio: "https://eye-search.ucl.ac.uk"
+  portfolio: ""
 };
 
 // Professional Summary
@@ -107,6 +109,7 @@ export const experiences: Experience[] = [
     company: "Rvere",
     role: "Senior Backend Engineer",
     period: "Apr 2025 – Present",
+    location: "Toronto, Canada",
     description: [
       "Led performance and scalability improvements for AI-powered web applications",
       "Designed and implemented optimization pipelines using FAISS for semantic search and Gemini-based LLM workflows for automated code and asset transformations",
@@ -133,6 +136,7 @@ export const experiences: Experience[] = [
     company: "23People – Equifax",
     role: "Software Engineer",
     period: "Dec 2023 – Jul 2024",
+    location: "Latam",
     description: [
       "Built and optimized Big Data ETL pipelines using Google Cloud Platform services including BigQuery and Dataflow",
       "Implemented scalable data processing systems using Apache Beam, Python, and Flask",
@@ -159,6 +163,7 @@ export const experiences: Experience[] = [
     company: "Gamaga – Kongregate",
     role: "Software Engineer",
     period: "Apr 2023 – Aug 2023",
+    location: "Latam-USA",
     description: [
       "Developed gameplay systems for the MMO RPG Bit Heroes Quest using Unity and C#",
       "Integrated backend systems using Java, PHP, and AWS services",
@@ -173,6 +178,7 @@ export const experiences: Experience[] = [
     company: "Incremental SPA",
     role: "Full-Stack Developer",
     period: "Jan 2019 – Jan 2019",
+    location: "Chile",
     description: [
       "Platform for big data analysis and synchronization of education data for school management",
       "Full-Stack development and implementation of Big Data ETL pipelines"
@@ -183,6 +189,7 @@ export const experiences: Experience[] = [
     company: "Project ALeRCE (NLHPC)",
     role: "Backend Developer",
     period: "Jun 2018 – Dec 2018",
+    location: "Chile",
     description: [
       "Developed backend systems for ALeRCE, a real-time astronomical alert broker processing data from the Zwicky Transient Facility (ZTF)",
       "Worked on high-throughput data pipelines using distributed systems and streaming architectures"
@@ -194,6 +201,7 @@ export const experiences: Experience[] = [
     company: "GERO Institute",
     role: "Game Developer",
     period: "Jul 2017 – Dec 2017",
+    location: "Chile-London UK",
     description: [
       "Developed serious video games focused on Alzheimer's disease prevention",
       "Worked on Sinapp, an educational game promoting healthy cognitive habits through gameplay systems"
@@ -204,6 +212,7 @@ export const experiences: Experience[] = [
     company: "Newtenberg",
     role: "Software Engineer Intern",
     period: "Jan 2016 – Mar 2016",
+    location: "Chile",
     description: [
       "Developed data visualization software for public infrastructure and state digitalization projects in Chile",
       "Worked on systems for managing large collections of data and improving communication with citizens"
@@ -298,14 +307,25 @@ export const projects: Project[] = [
 export const education: Education[] = [
   {
     degree: "Master in Game Design and Development",
-    institution: "European University of Madrid",
-    period: "2026 – 2027"
+    institution: "European University of Madrid, Creative Campus",
+    period: "2025 – Expected graduation 2026 Q4-2027 Q1",
+    description: "Technology-focused program centered on game engine development and gameplay systems, with hands-on work in Unreal Engine and Unity. Coursework covers gameplay prototyping, systems design, level design, UX for games, multiplayer and free-to-play design, and a capstone project involving full game development."
   },
   {
     degree: "Master of Science in Computer Science",
     institution: "University of Chile",
     period: "2022",
-    honors: "Graduated with highest honors"
+    honors: "Graduated with highest honors",
+    description: "Program focused on Human-Computer Interaction (HCI), user experience (UX), and gamification, with emphasis on the design and evaluation of interactive systems in applied contexts.",
+    focus: [
+      "Human-Computer Interaction theory, usability, and user-centered design",
+      "UX evaluation methods, including user studies, quantitative metrics, and qualitative analysis",
+      "Gamification theory and game design elements applied to non-game systems",
+      "Motivation, engagement, and adherence in interactive applications",
+      "Design of interactive systems informed by cognitive science and behavioral psychology",
+      "Research methods for interactive computing, including experimental design and mixed-method evaluation",
+      "Ethical and effectiveness considerations in technology-assisted interventions"
+    ]
   },
   {
     degree: "Bachelor of Engineering in Civil Computer Science",

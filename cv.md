@@ -38,11 +38,26 @@ University of Chile | 2024
 ## Education
 
 **Master in Game Design and Development**
-European University of Madrid | 2026 – 2027
+European University of Madrid, Creative Campus | 2025 – 2026
+
+Technology-focused program centered on game engine development and gameplay systems, with hands-on work in Unreal Engine and Unity. Coursework covers gameplay prototyping, systems design, level design, UX for games, multiplayer and free-to-play design, and a capstone project involving full game development.
 
 **Master of Science in Computer Science**
 University of Chile | 2022
 Graduated with highest honors
+
+Program focused on Human-Computer Interaction (HCI), user experience (UX), and gamification, with emphasis on the design and evaluation of interactive systems in applied contexts.
+
+**Academic focus and training:**
+
+* Human-Computer Interaction theory, usability, and user-centered design
+* UX evaluation methods, including user studies, quantitative metrics, and qualitative analysis
+* Gamification theory and game design elements applied to non-game systems
+* Motivation, engagement, and adherence in interactive applications
+* Design of interactive systems informed by cognitive science and behavioral psychology
+* Research methods for interactive computing, including experimental design and mixed-method evaluation
+* Ethical and effectiveness considerations in technology-assisted interventions
+
 
 **Bachelor of Engineering in Civil Computer Science**
 University of Chile | 2018
@@ -57,7 +72,7 @@ Graduated with highest honors
 **Rvere** | Apr 2025 – Present
 
 * Led performance and scalability improvements for AI-powered web applications
-* Designed and implemented optimization pipelines using FAISS for semantic search and Gemini-based LLM workflows for automated code and asset transformations
+* Designed and implemented optimization pipelines using RAG and FAISS for semantic search and Gemini-based LLM workflows for automated code and asset transformations
 * Built robust testing infrastructure for LLM-driven optimization and transformation pipelines
 * Developed backend services with Python and React, deployed through CI/CD pipelines on Google Cloud Platform
 * Contributed to product design discussions and development of custom LLM models focused on optimization of Shopify-based websites
