@@ -1,25 +1,16 @@
-import Navigation from './components/Navigation'
-import Hero from './components/Hero'
-import Summary from './components/Summary'
-import Experience from './components/Experience'
-import Projects from './components/Projects'
-import Skills from './components/Skills'
-import Education from './components/Education'
-import Footer from './components/Footer'
+import { HashRouter, Routes, Route } from 'react-router-dom';
+import HomePage from './pages/HomePage';
+import ProjectDetailPage from './pages/ProjectDetailPage';
 
 function App() {
   return (
-    <div className="min-h-screen">
-      <Navigation />
-      <Hero />
-      <Summary />
-      <Experience />
-      <Projects />
-      <Skills />
-      <Education />
-      <Footer />
-    </div>
-  )
+    <HashRouter>
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/project/:slug" element={<ProjectDetailPage />} />
+      </Routes>
+    </HashRouter>
+  );
 }
 
-export default App
+export default App;

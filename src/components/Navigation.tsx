@@ -1,14 +1,15 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Menu, X, Sun, Moon } from 'lucide-react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useActiveSection, useScrollProgress } from '../hooks/useScrollAnimation';
 import { useDarkMode } from '../hooks/useDarkMode';
 
 const sections = [
   { id: 'hero', label: 'Home' },
   { id: 'summary', label: 'About' },
-  { id: 'experience', label: 'Experience' },
   { id: 'projects', label: 'Projects' },
+  { id: 'experience', label: 'Experience' },
   { id: 'skills', label: 'Skills' },
   { id: 'education', label: 'Education' },
 ];
@@ -19,6 +20,9 @@ export default function Navigation() {
   const activeSection = useActiveSection(sections.map(s => s.id));
   const scrollProgress = useScrollProgress();
   const [isDark, setIsDark] = useDarkMode();
+  const location = useLocation();
+  const navigate = useNavigate();
+  const isHomePage = location.pathname === '/';
 
   useEffect(() => {
     const handleScroll = () => {
@@ -30,16 +34,20 @@ export default function Navigation() {
   }, []);
 
   const scrollToSection = (id: string) => {
-    const element = document.getElementById(id);
-    if (element) {
-      const offset = 80;
-      const elementPosition = element.offsetTop - offset;
-      window.scrollTo({
-        top: elementPosition,
-        behavior: 'smooth'
-      });
-      setIsMobileMenuOpen(false);
+    if (isHomePage) {
+      const element = document.getElementById(id);
+      if (element) {
+        const offset = 80;
+        const elementPosition = element.offsetTop - offset;
+        window.scrollTo({
+          top: elementPosition,
+          behavior: 'smooth'
+        });
+      }
+    } else {
+      navigate(`/#${id}`);
     }
+    setIsMobileMenuOpen(false);
   };
 
   return (

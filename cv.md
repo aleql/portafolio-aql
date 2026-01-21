@@ -7,7 +7,7 @@
 📧 [alejandroquijadaleyton@gmail.com](mailto:alejandroquijadaleyton@gmail.com)
 🔗 [LinkedIn](https://www.linkedin.com/in/alejandro-quijada-b364b5235/)
 💻 [GitHub](https://github.com/aleql)
-🌐 [Portfolio](https://eye-search.ucl.ac.uk)
+🌐 [Portfolio](https://eye-search.co.uk/)
 
 ---
 
@@ -133,7 +133,7 @@ AWS (EC2, DynamoDB, Lambda, S3)
 Data analysis with SAS and R
 
 **Live**
-[https://eye-search.ucl.ac.uk](https://eye-search.ucl.ac.uk)
+[https://eye-search.co.uk/](https://eye-search.co.uk/)
 
 ---
 
@@ -292,7 +292,7 @@ I led the technical development and redesign of the application, implemented gam
 Unity WebGL, Node.js, MySQL, AWS, React
 
 **Live**
-[https://eye-search.ucl.ac.uk](https://eye-search.ucl.ac.uk)
+[https://eye-search.co.uk/](https://eye-search.co.uk/)
 
 **Related research**
 Study on the application of gamification mechanisms to improve patient adherence in web-based hemianopia therapy.

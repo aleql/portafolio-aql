@@ -11,7 +11,7 @@ export default function Footer() {
           {/* About */}
           <div>
             <h3 className="text-2xl font-bold font-game text-white dark:text-primary-400 mb-4 dark:text-glow">
-              {personalInfo.name.split(' ')[0]} {personalInfo.name.split(' ')[personalInfo.name.split(' ').length - 1]}
+              {personalInfo.name.split(' ')[0]} {personalInfo.name.split(' ')[1]}
             </h3>
             <p className="text-gray-400 dark:text-gray-500 mb-4">
               Building scalable systems, therapeutic applications, and engaging gameplay experiences.
