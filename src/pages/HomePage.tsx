@@ -13,17 +13,20 @@ export default function HomePage() {
   const location = useLocation();
 
   useEffect(() => {
-    // Handle hash-based navigation (e.g., /#projects)
-    if (location.hash) {
-      const id = location.hash.replace('#', '');
-      const element = document.getElementById(id);
-      if (element) {
-        setTimeout(() => {
-          const offset = 80;
-          const elementPosition = element.offsetTop - offset;
-          window.scrollTo({ top: elementPosition, behavior: 'smooth' });
-        }, 100);
-      }
+    // Handle section navigation via query (e.g., /?section=projects)
+    const params = new URLSearchParams(location.search);
+    const section = params.get('section');
+    const id = section || (location.hash ? location.hash.replace('#', '') : '');
+    if (!id) {
+      return;
+    }
+    const element = document.getElementById(id);
+    if (element) {
+      setTimeout(() => {
+        const offset = 80;
+        const elementPosition = element.offsetTop - offset;
+        window.scrollTo({ top: elementPosition, behavior: 'smooth' });
+      }, 100);
     }
   }, [location]);
 

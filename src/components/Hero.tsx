@@ -24,6 +24,12 @@ export default function Hero() {
       });
     }
   };
+  const socialLinks = [
+    { icon: Github, href: personalInfo.github },
+    { icon: Linkedin, href: personalInfo.linkedin },
+    { icon: Mail, href: `mailto:${personalInfo.email}` },
+    { icon: ExternalLink, href: personalInfo.portfolio }
+  ].filter((social) => Boolean(social.href));
 
   return (
     <section id="hero" className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-gray-50 via-white to-primary-50 dark:from-game-darker dark:via-game-dark dark:to-game-darker scanlines">
@@ -210,12 +216,7 @@ export default function Hero() {
             transition={{ duration: 0.8, delay: 1 }}
             className="flex items-center justify-center gap-4 mb-12"
           >
-            {[
-              { icon: Github, href: personalInfo.github },
-              { icon: Linkedin, href: personalInfo.linkedin },
-              { icon: Mail, href: `mailto:${personalInfo.email}` },
-              { icon: ExternalLink, href: personalInfo.portfolio }
-            ].map((social, i) => (
+            {socialLinks.map((social, i) => (
               <motion.a
                 key={i}
                 href={social.href}

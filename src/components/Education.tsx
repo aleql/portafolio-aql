@@ -46,7 +46,7 @@ export default function Education() {
                   <ul className="space-y-1">
                     {edu.focus.map((item, i) => (
                       <li key={i} className="text-gray-700 dark:text-gray-300 text-sm flex gap-2">
-                        <span className="text-primary-600 dark:text-primary-400">•</span>
+                        <span className="text-primary-600 dark:text-primary-400">-</span>
                         <span>{item}</span>
                       </li>
                     ))}
@@ -78,7 +78,7 @@ export default function Education() {
           <ul className="space-y-2">
             {teaching.responsibilities.map((resp, i) => (
               <li key={i} className="text-gray-700 dark:text-gray-300 flex gap-2">
-                <span className="text-primary-600 dark:text-primary-400 mt-1">•</span>
+                <span className="text-primary-600 dark:text-primary-400 mt-1">-</span>
                 <span>{resp}</span>
               </li>
             ))}

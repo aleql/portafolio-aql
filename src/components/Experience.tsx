@@ -52,7 +52,7 @@ export default function Experience() {
             <ul className="space-y-2 mb-4">
               {exp.description.map((desc, i) => (
                 <li key={i} className="text-gray-700 dark:text-gray-300 leading-relaxed flex gap-2">
-                  <span className="text-primary-600 dark:text-primary-400 mt-1.5">•</span>
+                  <span className="text-primary-600 dark:text-primary-400 mt-1.5">-</span>
                   <span>{desc}</span>
                 </li>
               ))}

@@ -4,12 +4,12 @@ A modern, minimalist portfolio website showcasing professional experience, proje
 
 ## Features
 
-- 🎨 Modern & minimalist design
-- ✨ Rich animations powered by Framer Motion
-- 📱 Fully responsive (mobile, tablet, desktop)
-- ⚡ Fast performance with Vite
-- 🎯 Smooth scrolling navigation
-- 🌐 Deployable to GitHub Pages
+- Modern and minimalist design
+- Rich animations powered by Framer Motion
+- Fully responsive (mobile, tablet, desktop)
+- Fast performance with Vite
+- Smooth scrolling navigation
+- Deployable to GitHub Pages
 
 ## Tech Stack
 
@@ -99,7 +99,7 @@ This will:
 ### Configure GitHub Pages
 
 After deploying, go to your repository settings on GitHub:
-1. Navigate to **Settings** → **Pages**
+1. Navigate to **Settings** -> **Pages**
 2. Under **Source**, select **gh-pages** branch
 3. Click **Save**
 
@@ -109,31 +109,31 @@ Your portfolio will be live at `https://your-username.github.io/your-repo-name/`
 
 ```
 portofoloio-final/
-├── src/
-│   ├── components/          # React components
-│   │   ├── common/          # Reusable components
-│   │   ├── Navigation.tsx
-│   │   ├── Hero.tsx
-│   │   ├── Summary.tsx
-│   │   ├── Experience.tsx
-│   │   ├── Projects.tsx
-│   │   ├── Skills.tsx
-│   │   ├── Education.tsx
-│   │   └── Footer.tsx
-│   ├── data/
-│   │   └── portfolio.ts     # Portfolio data
-│   ├── hooks/
-│   │   └── useScrollAnimation.ts
-│   ├── styles/
-│   │   └── globals.css
-│   ├── App.tsx
-│   └── main.tsx
-├── public/
-├── index.html
-├── package.json
-├── vite.config.ts
-├── tailwind.config.js
-└── tsconfig.json
+- src/
+  - components/          # React components
+    - common/            # Reusable components
+    - Navigation.tsx
+    - Hero.tsx
+    - Summary.tsx
+    - Experience.tsx
+    - Projects.tsx
+    - Skills.tsx
+    - Education.tsx
+    - Footer.tsx
+  - data/
+    - portfolio.ts       # Portfolio data
+  - hooks/
+    - useScrollAnimation.ts
+  - styles/
+    - globals.css
+  - App.tsx
+  - main.tsx
+- public/
+- index.html
+- package.json
+- vite.config.ts
+- tailwind.config.js
+- tsconfig.json
 ```
 
 ## Customization
@@ -176,4 +176,4 @@ MIT License - feel free to use this template for your own portfolio!
 
 ---
 
-Built with ❤️ using React & TypeScript
+Built with heart using React & TypeScript

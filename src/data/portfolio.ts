@@ -114,7 +114,7 @@ export const experiences: Experience[] = [
   {
     company: "Rvere",
     role: "Senior Backend Engineer",
-    period: "Apr 2025 – Present",
+    period: "Apr 2025 - Present",
     location: "Toronto, Canada",
     description: [
       "Led performance and scalability improvements for AI-powered web applications",
@@ -128,7 +128,7 @@ export const experiences: Experience[] = [
   {
     company: "University of Oxford, Medical Sciences Division",
     role: "Full-Stack Developer",
-    period: "Jul 2024 – Apr 2025",
+    period: "Jul 2024 - Apr 2025",
     location: "Oxford, United Kingdom",
     description: [
       "Developed and maintained the Multi-Dimensional Viewer (MDV), a platform for analyzing, annotating, and sharing multi-dimensional biological data",
@@ -139,9 +139,9 @@ export const experiences: Experience[] = [
     technologies: ["React", "TypeScript", "Node.js", "Python", "Flask", "Apache Kafka", "PostgreSQL", "Polars", "Dask", "Celery"]
   },
   {
-    company: "23People – Equifax",
+    company: "23People - Equifax",
     role: "Software Engineer",
-    period: "Dec 2023 – Jul 2024",
+    period: "Dec 2023 - Jul 2024",
     location: "Latam",
     description: [
       "Built and optimized Big Data ETL pipelines using Google Cloud Platform services including BigQuery and Dataflow",
@@ -153,7 +153,7 @@ export const experiences: Experience[] = [
   {
     company: "UCL Institute of Cognitive Neuroscience",
     role: "Full-Stack Developer & UX Designer",
-    period: "Jan 2020 – Aug 2023",
+    period: "Jan 2020 - Aug 2023",
     location: "London, United Kingdom",
     description: [
       "Full-Stack and Game Developer on Alex Leff's team, contributing to therapeutic applications including Eye-Search, ReadRight, and iTalk",
@@ -166,9 +166,9 @@ export const experiences: Experience[] = [
     link: "https://eye-search.co.uk/"
   },
   {
-    company: "Gamaga – Kongregate",
+    company: "Gamaga - Kongregate",
     role: "Software Engineer",
-    period: "Apr 2023 – Aug 2023",
+    period: "Apr 2023 - Aug 2023",
     location: "Latam-USA",
     description: [
       "Developed gameplay systems for the MMO RPG Bit Heroes Quest using Unity and C#",
@@ -183,7 +183,7 @@ export const experiences: Experience[] = [
   {
     company: "Incremental SPA",
     role: "Full-Stack Developer",
-    period: "Jan 2019 – Jan 2019",
+    period: "Jan 2019 - Jan 2019",
     location: "Chile",
     description: [
       "Platform for big data analysis and synchronization of education data for school management",
@@ -194,7 +194,7 @@ export const experiences: Experience[] = [
   {
     company: "Project ALeRCE (NLHPC)",
     role: "Backend Developer",
-    period: "Jun 2018 – Dec 2018",
+    period: "Jun 2018 - Dec 2018",
     location: "Chile",
     description: [
       "Developed backend systems for ALeRCE, a real-time astronomical alert broker processing data from the Zwicky Transient Facility (ZTF)",
@@ -206,7 +206,7 @@ export const experiences: Experience[] = [
   {
     company: "GERO Institute",
     role: "Game Developer",
-    period: "Jul 2017 – Dec 2017",
+    period: "Jul 2017 - Dec 2017",
     location: "Chile-London UK",
     description: [
       "Developed serious video games focused on Alzheimer's disease prevention",
@@ -217,7 +217,7 @@ export const experiences: Experience[] = [
   {
     company: "Newtenberg",
     role: "Software Engineer Intern",
-    period: "Jan 2016 – Mar 2016",
+    period: "Jan 2016 - Mar 2016",
     location: "Chile",
     description: [
       "Developed data visualization software for public infrastructure and state digitalization projects in Chile",
@@ -416,7 +416,7 @@ export const education: Education[] = [
   {
     degree: "Master in Game Design and Development",
     institution: "European University of Madrid, Creative Campus",
-    period: "2025 – Expected graduation 2026 Q4",
+    period: "2025 - Expected graduation 2026 Q4",
     description: "Technology-driven master's program specializing in game engine development and gameplay systems architecture. Extensive hands-on development combining theoretical design principles with practical implementation.",
     focus: [
       "Game Engines: Unreal Engine 5 (C++/Blueprint) & Unity (C#)",
@@ -457,17 +457,17 @@ export const researchRoles: ResearchRole[] = [
   {
     title: "Honorary Researcher",
     institution: "UCL Institute of Cognitive Neuroscience, University College London",
-    period: "Jul 2020 – Present"
+    period: "Jul 2020 - Present"
   },
   {
     title: "Human-Computer Interaction Researcher",
     institution: "Department of Computer Science, University of Chile",
-    period: "Mar 2020 – Present"
+    period: "Mar 2020 - Present"
   },
   {
     title: "Game UX Researcher and Game Developer",
     institution: "University of Chile Department of Computer Science",
-    period: "Oct 2023 – Present"
+    period: "Oct 2023 - Present"
   }
 ];
 

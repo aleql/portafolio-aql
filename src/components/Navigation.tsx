@@ -45,7 +45,7 @@ export default function Navigation() {
         });
       }
     } else {
-      navigate(`/#${id}`);
+      navigate(`/?section=${encodeURIComponent(id)}`);
     }
     setIsMobileMenuOpen(false);
   };

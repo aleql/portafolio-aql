@@ -14,9 +14,10 @@ export default function ProjectDetailPage() {
   const [isDark, setIsDark] = useDarkMode();
 
   const project = projects.find(p => p.slug === slug);
-  const currentIndex = projects.findIndex(p => p.slug === slug);
-  const prevProject = currentIndex > 0 ? projects[currentIndex - 1] : null;
-  const nextProject = currentIndex < projects.length - 1 ? projects[currentIndex + 1] : null;
+  const visibleProjects = projects.filter(p => !p.hidden);
+  const currentIndex = visibleProjects.findIndex(p => p.slug === slug);
+  const prevProject = currentIndex > 0 ? visibleProjects[currentIndex - 1] : null;
+  const nextProject = currentIndex >= 0 && currentIndex < visibleProjects.length - 1 ? visibleProjects[currentIndex + 1] : null;
 
   if (!project) {
     return (
@@ -25,7 +26,7 @@ export default function ProjectDetailPage() {
           <h1 className="text-4xl font-game text-gray-900 dark:text-white mb-4">Project Not Found</h1>
           <p className="text-gray-600 dark:text-gray-400 mb-6">The project you're looking for doesn't exist.</p>
           <Link
-            to="/#projects"
+            to="/?section=projects"
             className="inline-flex items-center gap-2 px-6 py-3 bg-primary-500 text-white rounded-lg font-medium hover:bg-primary-600 transition-colors"
           >
             <ArrowLeft size={20} />
@@ -46,8 +47,8 @@ export default function ProjectDetailPage() {
         className="fixed top-0 left-0 right-0 z-40 bg-white/90 dark:bg-game-dark/95 backdrop-blur-md border-b border-gray-200 dark:border-game-border"
       >
         <div className="container mx-auto px-4 max-w-7xl py-4 flex items-center justify-between">
-          <motion.button
-            onClick={() => navigate('/#projects')}
+            <motion.button
+            onClick={() => navigate('/?section=projects')}
             whileHover={{ x: -5 }}
             className="flex items-center gap-2 text-gray-600 dark:text-primary-400 hover:text-primary-600 dark:hover:text-primary-300 transition-colors font-medium"
           >

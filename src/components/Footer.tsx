@@ -1,8 +1,25 @@
 import { Github, Linkedin, Mail, ExternalLink, Heart } from 'lucide-react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { personalInfo } from '../data/portfolio';
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
+  const location = useLocation();
+  const navigate = useNavigate();
+  const isHomePage = location.pathname === '/';
+
+  const scrollToSection = (section: string) => {
+    if (isHomePage) {
+      const element = document.getElementById(section);
+      if (element) {
+        const offset = 80;
+        const elementPosition = element.offsetTop - offset;
+        window.scrollTo({ top: elementPosition, behavior: 'smooth' });
+      }
+      return;
+    }
+    navigate(`/?section=${encodeURIComponent(section)}`);
+  };
 
   return (
     <footer className="bg-gray-900 dark:bg-game-darker text-gray-300 dark:text-gray-400 py-12 border-t-2 border-gray-800 dark:border-primary-500/20">
@@ -25,14 +42,7 @@ export default function Footer() {
               {['summary', 'experience', 'projects', 'skills', 'education'].map((section) => (
                 <li key={section}>
                   <button
-                    onClick={() => {
-                      const element = document.getElementById(section);
-                      if (element) {
-                        const offset = 80;
-                        const elementPosition = element.offsetTop - offset;
-                        window.scrollTo({ top: elementPosition, behavior: 'smooth' });
-                      }
-                    }}
+                    onClick={() => scrollToSection(section)}
                     className="text-gray-400 dark:text-gray-500 hover:text-white dark:hover:text-primary-400 transition-colors capitalize"
                   >
                     {section}
@@ -70,14 +80,16 @@ export default function Footer() {
                 >
                   <Linkedin size={20} />
                 </a>
-                <a
-                  href={personalInfo.portfolio}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="p-2 bg-gray-800 dark:bg-game-card rounded-lg hover:bg-primary-600 dark:hover:bg-primary-500/20 dark:border-2 dark:border-transparent dark:hover:border-primary-500 transition-all"
-                >
-                  <ExternalLink size={20} />
-                </a>
+                {personalInfo.portfolio && (
+                  <a
+                    href={personalInfo.portfolio}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="p-2 bg-gray-800 dark:bg-game-card rounded-lg hover:bg-primary-600 dark:hover:bg-primary-500/20 dark:border-2 dark:border-transparent dark:hover:border-primary-500 transition-all"
+                  >
+                    <ExternalLink size={20} />
+                  </a>
+                )}
               </div>
             </div>
           </div>
@@ -85,7 +97,7 @@ export default function Footer() {
 
         <div className="border-t border-gray-800 dark:border-primary-500/20 pt-8 text-center">
           <p className="text-gray-500 dark:text-gray-600 flex items-center justify-center gap-2">
-            © {currentYear} {personalInfo.name}. Built with <Heart size={16} className="text-red-500 fill-red-500 dark:text-neon-pink dark:fill-neon-pink" /> using React & TypeScript
+            (c) {currentYear} {personalInfo.name}. Built with <Heart size={16} className="text-red-500 fill-red-500 dark:text-neon-pink dark:fill-neon-pink" /> using React & TypeScript
           </p>
         </div>
       </div>
