@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Github, Linkedin, Mail, ExternalLink, ChevronDown, Code2, Cpu, Zap, Box } from 'lucide-react';
+import { Github, Linkedin, Mail, ExternalLink, ChevronDown, Code2, Cpu, Zap, Box, Gamepad2 } from 'lucide-react';
 import { personalInfo } from '../data/portfolio';
 
 export default function Hero() {
@@ -271,6 +271,21 @@ export default function Hero() {
               <span className="relative z-10 text-primary-600 dark:text-primary-400 flex items-center gap-2">
                 <Code2 size={20} />
                 Download CV
+              </span>
+            </motion.a>
+
+            <motion.a
+              href="#/aleql-gamedev"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="relative px-10 py-4 font-semibold font-mono uppercase tracking-wider group corner-cut"
+            >
+              <div className="absolute inset-0 bg-transparent" />
+              <div className="absolute inset-0 border-2 border-accent-600 dark:border-accent-500 group-hover:shadow-neon-lg transition-all" />
+              <div className="absolute inset-0 bg-accent-500/10 dark:bg-accent-500/20 opacity-0 group-hover:opacity-100 transition-opacity" />
+              <span className="relative z-10 text-accent-600 dark:text-accent-400 flex items-center gap-2">
+                <Gamepad2 size={20} />
+                Game CV
               </span>
             </motion.a>
           </motion.div>
