@@ -1,13 +1,13 @@
 /**
  * TacticalHero — Sonar-reveal radar display
  *
- * The radar sweep is NOT decorative. It is the reveal mask.
- * Project clips are hidden underneath; the rotating sweep arm
- * temporarily exposes them through a moving angular wedge.
- * Once the sweep passes, the clip disappears back into darkness.
+ * 3 fixed sector positions. Each sector independently cycles through all
+ * featured projects. When the sweep arm exits a sector's angular range,
+ * that sector advances to its next project — so every rotation reveals
+ * different footage in each zone.
  */
 
-import { useEffect, useRef, useCallback, useState } from 'react';
+import { useEffect, useRef, useCallback, useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
 import {
   Zap, Code2, Gamepad2, ChevronDown,
@@ -17,76 +17,75 @@ import { personalInfo, projects } from '../data/portfolio';
 
 // ─── Constants ─────────────────────────────────────────────────────────────────
 
-/** How many degrees the sweep travels per second (full revolution ≈ 15 s) */
-const SWEEP_DEG_PER_SEC = 24;
+const SWEEP_DEG_PER_SEC = 22;  // → full revolution ≈ 16 s
+const TRAIL_DEG         = 52;  // width of the reveal wedge behind the arm
 
-/** Angular width of the reveal wedge (trailing behind the sweep arm) */
-const TRAIL_DEG = 48;
+// ─── Module-level statics (never change) ───────────────────────────────────────
 
-// ─── Types ─────────────────────────────────────────────────────────────────────
+const SECTOR_ANGLES = [
+  { startDeg: 15,  endDeg: 75,  color: '#00f0ff' },  // top-right
+  { startDeg: 135, endDeg: 195, color: '#ff00ff' },  // bottom-left
+  { startDeg: 255, endDeg: 315, color: '#00ff88' },  // bottom (near left)
+] as const;
 
-interface Sector {
-  id: number;
-  startDeg: number; // 0 = top (12-o'clock), clockwise
-  endDeg: number;
-  color: string;
-  label: string;
-  tech: string;
-  poster: string;
-  videoUrl?: string;
-}
-
-// ─── Helpers ───────────────────────────────────────────────────────────────────
-
-/**
- * Converts a sector [startDeg, endDeg] into a CSS clip-path polygon using
- * percentage coordinates so it works for any square element.
- * 0° = top, values increase clockwise.
- */
-function sectorPolygon(startDeg: number, endDeg: number, steps = 36): string {
+/** Precomputed CSS clip-path polygons for each sector (% coords, square elements) */
+function makeSectorPolygon(startDeg: number, endDeg: number, steps = 40): string {
   const pts = ['50% 50%'];
   for (let i = 0; i <= steps; i++) {
     const deg = startDeg + ((endDeg - startDeg) * i) / steps;
-    // -90 shifts 0° from east (canvas default) to north (our 0°)
     const rad = ((deg - 90) * Math.PI) / 180;
-    const x = (50 + 50 * Math.cos(rad)).toFixed(3);
-    const y = (50 + 50 * Math.sin(rad)).toFixed(3);
-    pts.push(`${x}% ${y}%`);
+    pts.push(`${(50 + 50 * Math.cos(rad)).toFixed(3)}% ${(50 + 50 * Math.sin(rad)).toFixed(3)}%`);
   }
   return `polygon(${pts.join(', ')})`;
 }
 
+const SECTOR_CLIPS = SECTOR_ANGLES.map((s) => makeSectorPolygon(s.startDeg, s.endDeg));
+
 // ─── Component ─────────────────────────────────────────────────────────────────
 
 export default function TacticalHero() {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const radarRef = useRef<HTMLDivElement>(null);
-  const rafRef = useRef<number>();
-  const sweepRef = useRef(0);
+  const canvasRef   = useRef<HTMLCanvasElement>(null);
+  const radarRef    = useRef<HTMLDivElement>(null);
+  const rafRef      = useRef<number>();
+  const sweepRef    = useRef(0);
   const lastTimeRef = useRef(0);
-  const activeSectorIdxRef = useRef(-1);
+
+  // Which project index is currently shown in each sector — cycles on arm exit
+  const [sectorProjIdx, setSectorProjIdx] = useState([0, 1, 2]);
+
+  // Tracks which sectors have already cycled in the current sweep rotation
+  const advancedThisRotation = useRef(new Set<number>());
+
+  // DOM refs for "Active Feeds" panel — updated directly to avoid per-frame re-renders
+  const feedElemsRef    = useRef<HTMLElement[]>([]);
+  const activeSectorRef = useRef(-1);
+
+  // Ref that canvas draw() reads for current project labels (avoids stale closures)
+  const sectorLabelsRef = useRef<{ label: string; tech: string }[]>([]);
 
   const [titleIndex, setTitleIndex] = useState(0);
-  const [activeSectorIdx, setActiveSectorIdx] = useState(-1);
 
-  // Build sector list from featured projects
-  const SECTOR_PRESETS: Pick<Sector, 'startDeg' | 'endDeg' | 'color'>[] = [
-    { startDeg: 20,  endDeg: 80,  color: '#00f0ff' }, // top-right
-    { startDeg: 155, endDeg: 215, color: '#ff00ff' }, // bottom-left
-    { startDeg: 265, endDeg: 320, color: '#00ff88' }, // bottom-right (near bottom)
-  ];
+  // All featured projects — stable reference
+  const allFeatured = useMemo(
+    () => projects.filter((p) => p.featured),
+    [] // eslint-disable-line react-hooks/exhaustive-deps
+  );
 
-  const sectors: Sector[] = projects
-    .filter((p) => p.featured)
-    .slice(0, 3)
-    .map((p, i) => ({
-      id: i,
-      ...SECTOR_PRESETS[i],
-      label: p.title,
-      tech: p.technologies.slice(0, 2).join(' / '),
-      poster: p.images[0] ?? '',
-      videoUrl: (p as Record<string, unknown>).videoUrl as string | undefined,
+  // Update the labels ref whenever sectorProjIdx changes
+  useEffect(() => {
+    sectorLabelsRef.current = sectorProjIdx.map((pi) => ({
+      label: allFeatured[pi % allFeatured.length]?.title ?? '',
+      tech:  allFeatured[pi % allFeatured.length]?.technologies.slice(0, 2).join(' / ') ?? '',
     }));
+  }, [sectorProjIdx, allFeatured]);
+
+  // Initialize labels ref synchronously
+  if (sectorLabelsRef.current.length === 0) {
+    sectorLabelsRef.current = sectorProjIdx.map((pi) => ({
+      label: allFeatured[pi % allFeatured.length]?.title ?? '',
+      tech:  allFeatured[pi % allFeatured.length]?.technologies.slice(0, 2).join(' / ') ?? '',
+    }));
+  }
 
   // ── Rotating title ───────────────────────────────────────────────────────────
   useEffect(() => {
@@ -97,173 +96,170 @@ export default function TacticalHero() {
     return () => clearInterval(id);
   }, []);
 
-  // ── Canvas draw ───────────────────────────────────────────────────────────────
+  // ── Canvas draw (reads refs → no stale values) ─────────────────────────────
   const draw = useCallback(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    const W = canvas.width;
-    const H = canvas.height;
+    const W  = canvas.width;
+    const H  = canvas.height;
     const cx = W / 2;
     const cy = H / 2;
-    const R = Math.min(W, H) / 2 - 1;
+    const R  = Math.min(W, H) / 2 - 1;
 
-    // Convert current sweep to radians; our 0° is top, clockwise
     const sweepDeg = sweepRef.current;
     const sweepRad = ((sweepDeg - 90) * Math.PI) / 180;
-    const trailRad = (TRAIL_DEG * Math.PI) / 180;
+    const trailRad = (TRAIL_DEG  * Math.PI) / 180;
 
     ctx.clearRect(0, 0, W, H);
 
-    // ── 1. Dark overlay (fill entire canvas) ──────────────────────────────────
-    ctx.fillStyle = 'rgba(5, 8, 20, 0.96)';
+    // ── 1. Fully opaque dark overlay — images completely hidden ───────────────
+    ctx.fillStyle = 'rgb(5, 8, 20)';
     ctx.fillRect(0, 0, W, H);
 
-    // ── 2. Punch the sweep wedge using destination-out ─────────────────────────
-    // The wedge trails behind the sweep arm: from (sweepRad - trailRad) to sweepRad.
-    // We draw it in slices so we can apply a gradient opacity (dark at trailing
-    // edge → transparent at leading edge) for a sonar "glow" feel.
+    // ── 2. Punch sweep wedge (destination-out gradient) ───────────────────────
     ctx.globalCompositeOperation = 'destination-out';
-
-    const STEPS = 30;
+    const STEPS = 32;
     for (let i = 0; i < STEPS; i++) {
-      const t = i / STEPS; // 0 = trailing edge, 1 = leading edge (arm)
+      const t  = i / STEPS;
       const a0 = sweepRad - trailRad + trailRad * t;
       const a1 = sweepRad - trailRad + trailRad * ((i + 1) / STEPS);
-
       ctx.beginPath();
       ctx.moveTo(cx, cy);
       ctx.arc(cx, cy, R, a0, a1);
       ctx.closePath();
-
-      // Leading edge (near the arm) → strongly transparent (reveals video well)
-      // Trailing edge → nearly opaque (fades back to dark quickly)
-      const alpha = Math.pow(t, 0.5) * 0.9;
-      ctx.fillStyle = `rgba(0, 0, 0, ${alpha})`;
+      ctx.fillStyle = `rgba(0,0,0,${(Math.pow(t, 0.45) * 0.92).toFixed(3)})`;
       ctx.fill();
     }
-
     ctx.globalCompositeOperation = 'source-over';
 
-    // ── 3. Radar grid — drawn on top, visible everywhere ─────────────────────
-    ctx.lineWidth = 0.8;
-
-    // Concentric circles
+    // ── 3. Radar grid ─────────────────────────────────────────────────────────
     for (let ring = 1; ring <= 4; ring++) {
       ctx.beginPath();
       ctx.arc(cx, cy, (R * ring) / 4, 0, Math.PI * 2);
-      ctx.strokeStyle = ring === 4 ? 'rgba(0,240,255,0.20)' : 'rgba(0,240,255,0.08)';
+      ctx.strokeStyle = ring === 4 ? 'rgba(0,240,255,0.22)' : 'rgba(0,240,255,0.07)';
+      ctx.lineWidth   = ring === 4 ? 1.5 : 0.8;
       ctx.stroke();
     }
-
-    // Radial tick lines every 30°
     for (let deg = 0; deg < 360; deg += 30) {
-      const a = ((deg - 90) * Math.PI) / 180;
+      const a    = ((deg - 90) * Math.PI) / 180;
+      const tick = deg % 90 === 0 ? 0.80 : 0.91;
       ctx.beginPath();
-      ctx.moveTo(cx + (R * 0.92) * Math.cos(a), cy + (R * 0.92) * Math.sin(a));
+      ctx.moveTo(cx + R * tick * Math.cos(a), cy + R * tick * Math.sin(a));
       ctx.lineTo(cx + R * Math.cos(a), cy + R * Math.sin(a));
-      ctx.strokeStyle = 'rgba(0,240,255,0.25)';
+      ctx.strokeStyle = deg % 90 === 0 ? 'rgba(0,240,255,0.28)' : 'rgba(0,240,255,0.12)';
+      ctx.lineWidth   = 1;
       ctx.stroke();
     }
 
-    // Main cross at 0/90/180/270
-    ctx.lineWidth = 0.5;
-    for (const deg of [0, 90, 180, 270]) {
-      const a = ((deg - 90) * Math.PI) / 180;
-      ctx.beginPath();
-      ctx.moveTo(cx, cy);
-      ctx.lineTo(cx + R * Math.cos(a), cy + R * Math.sin(a));
-      ctx.strokeStyle = 'rgba(0,240,255,0.10)';
-      ctx.stroke();
-    }
-
-    // ── 4. Sector arc outlines (subtle boundary markers) ──────────────────────
-    for (const s of sectors) {
+    // ── 4. Sector boundary arcs ───────────────────────────────────────────────
+    for (const s of SECTOR_ANGLES) {
       const a0 = ((s.startDeg - 90) * Math.PI) / 180;
-      const a1 = ((s.endDeg - 90) * Math.PI) / 180;
+      const a1 = ((s.endDeg   - 90) * Math.PI) / 180;
       ctx.beginPath();
       ctx.moveTo(cx, cy);
-      ctx.arc(cx, cy, R * 0.97, a0, a1);
+      ctx.arc(cx, cy, R * 0.96, a0, a1);
       ctx.closePath();
-      ctx.strokeStyle = `${s.color}1A`; // ~10% opacity outline
-      ctx.lineWidth = 1.5;
+      ctx.strokeStyle = `${s.color}18`;
+      ctx.lineWidth   = 1;
       ctx.stroke();
     }
 
-    // ── 5. Sector labels (dim markers, always visible on the radar) ───────────
-    ctx.textAlign = 'center';
+    // ── 5. Sector labels (current project for each sector) ────────────────────
+    ctx.textAlign    = 'center';
     ctx.textBaseline = 'middle';
-    for (const s of sectors) {
+    SECTOR_ANGLES.forEach((s, i) => {
       const midDeg = (s.startDeg + s.endDeg) / 2;
       const midRad = ((midDeg - 90) * Math.PI) / 180;
-      const lR = R * 0.62;
-      const lx = cx + lR * Math.cos(midRad);
-      const ly = cy + lR * Math.sin(midRad);
+      const lR     = R * 0.60;
+      const lx     = cx + lR * Math.cos(midRad);
+      const ly     = cy + lR * Math.sin(midRad);
+      const info   = sectorLabelsRef.current[i];
+      if (!info) return;
 
-      ctx.font = 'bold 9px "JetBrains Mono", monospace';
-      ctx.fillStyle = `${s.color}55`;
-      ctx.fillText(s.label.toUpperCase().slice(0, 12), lx, ly - 6);
-      ctx.font = '8px "JetBrains Mono", monospace';
-      ctx.fillStyle = `${s.color}33`;
-      ctx.fillText(s.tech, lx, ly + 6);
-    }
+      ctx.font      = 'bold 9px "JetBrains Mono", monospace';
+      ctx.fillStyle = `${s.color}60`;
+      ctx.fillText(info.label.toUpperCase().slice(0, 12), lx, ly - 5);
+      ctx.font      = '8px "JetBrains Mono", monospace';
+      ctx.fillStyle = `${s.color}38`;
+      ctx.fillText(info.tech, lx, ly + 6);
+    });
 
     // ── 6. Sweep arm ──────────────────────────────────────────────────────────
-    ctx.lineWidth = 2;
+    ctx.lineWidth   = 2;
     ctx.strokeStyle = '#00f0ff';
     ctx.shadowColor = '#00f0ff';
-    ctx.shadowBlur = 12;
+    ctx.shadowBlur  = 14;
     ctx.beginPath();
     ctx.moveTo(cx, cy);
-    ctx.lineTo(
-      cx + (R + 1) * Math.cos(sweepRad),
-      cy + (R + 1) * Math.sin(sweepRad)
-    );
+    ctx.lineTo(cx + (R + 2) * Math.cos(sweepRad), cy + (R + 2) * Math.sin(sweepRad));
     ctx.stroke();
     ctx.shadowBlur = 0;
 
     // ── 7. Center dot ─────────────────────────────────────────────────────────
     ctx.beginPath();
     ctx.arc(cx, cy, 3.5, 0, Math.PI * 2);
-    ctx.fillStyle = '#00f0ff';
+    ctx.fillStyle   = '#00f0ff';
     ctx.shadowColor = '#00f0ff';
-    ctx.shadowBlur = 14;
+    ctx.shadowBlur  = 16;
     ctx.fill();
     ctx.shadowBlur = 0;
 
-    // ── 8. Degree markers (N/S/E/W) ───────────────────────────────────────────
-    const cardinal: [string, number][] = [['N', 0], ['E', 90], ['S', 180], ['W', 270]];
-    ctx.font = '9px "JetBrains Mono", monospace';
-    ctx.fillStyle = 'rgba(0,240,255,0.35)';
-    ctx.textAlign = 'center';
+    // ── 8. Cardinal labels ────────────────────────────────────────────────────
+    ctx.font         = '9px "JetBrains Mono", monospace';
+    ctx.fillStyle    = 'rgba(0,240,255,0.30)';
+    ctx.textAlign    = 'center';
     ctx.textBaseline = 'middle';
-    for (const [label, deg] of cardinal) {
+    for (const [lbl, deg] of [['N', 0], ['E', 90], ['S', 180], ['W', 270]] as const) {
       const a = ((deg - 90) * Math.PI) / 180;
-      ctx.fillText(label, cx + (R - 12) * Math.cos(a), cy + (R - 12) * Math.sin(a));
+      ctx.fillText(lbl, cx + (R - 12) * Math.cos(a), cy + (R - 12) * Math.sin(a));
     }
-  }, [sectors]);
+  }, []); // no dependencies — reads only refs
 
-  // ── Animation loop ────────────────────────────────────────────────────────────
+  // ── RAF animation loop ─────────────────────────────────────────────────────
   useEffect(() => {
     const animate = (ts: number) => {
       if (lastTimeRef.current !== 0) {
-        const delta = (ts - lastTimeRef.current) / 1000;
-        sweepRef.current = (sweepRef.current + SWEEP_DEG_PER_SEC * delta) % 360;
+        const delta  = (ts - lastTimeRef.current) / 1000;
+        const before = sweepRef.current;
+        const after  = (before + SWEEP_DEG_PER_SEC * delta) % 360;
+        sweepRef.current = after;
+
+        // If we just wrapped past 360°, allow all sectors to advance again
+        if (after < before) {
+          advancedThisRotation.current.clear();
+        }
+
+        // When arm crosses a sector's endDeg → cycle that sector to next project
+        SECTOR_ANGLES.forEach((s, i) => {
+          const crossed = before < s.endDeg && after >= s.endDeg;
+          if (crossed && !advancedThisRotation.current.has(i)) {
+            advancedThisRotation.current.add(i);
+            setSectorProjIdx((prev) => {
+              const next = [...prev];
+              next[i] = (next[i] + 1) % allFeatured.length;
+              return next;
+            });
+          }
+        });
       }
       lastTimeRef.current = ts;
 
       draw();
 
-      // Detect which sector the sweep arm is currently inside (for right-panel highlight)
-      const cur = sectors.findIndex((s) => {
-        const deg = sweepRef.current;
-        return deg >= s.startDeg && deg <= s.endDeg;
+      // Active sector highlight via direct DOM
+      const cur = SECTOR_ANGLES.findIndex((s) => {
+        const d = sweepRef.current;
+        return d >= s.startDeg && d <= s.endDeg;
       });
-      if (cur !== activeSectorIdxRef.current) {
-        activeSectorIdxRef.current = cur;
-        setActiveSectorIdx(cur);
+      if (cur !== activeSectorRef.current) {
+        activeSectorRef.current = cur;
+        feedElemsRef.current.forEach((el, i) => {
+          if (!el) return;
+          cur === i ? el.setAttribute('data-active', 'true') : el.removeAttribute('data-active');
+        });
       }
 
       rafRef.current = requestAnimationFrame(animate);
@@ -274,121 +270,117 @@ export default function TacticalHero() {
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
       lastTimeRef.current = 0;
     };
-  }, [draw, sectors]);
+  }, [draw, allFeatured.length]); // stable — allFeatured.length never changes
 
-  // ── Sync canvas size to container ─────────────────────────────────────────────
+  // ── Canvas size synced to container ──────────────────────────────────────────
   useEffect(() => {
     const container = radarRef.current;
-    const canvas = canvasRef.current;
+    const canvas    = canvasRef.current;
     if (!container || !canvas) return;
-
     const sync = () => {
       const size = container.offsetWidth;
       if (canvas.width !== size || canvas.height !== size) {
-        canvas.width = size;
+        canvas.width  = size;
         canvas.height = size;
       }
     };
-
     sync();
     const ro = new ResizeObserver(sync);
     ro.observe(container);
     return () => ro.disconnect();
   }, []);
 
-  // ── Scroll helper ─────────────────────────────────────────────────────────────
   const scrollTo = (id: string) => {
     const el = document.getElementById(id);
     if (el) window.scrollTo({ top: el.offsetTop - 80, behavior: 'smooth' });
   };
 
   const navItems = [
-    { id: 'summary',    label: 'About',      icon: User      },
-    { id: 'projects',   label: 'Projects',   icon: Briefcase },
-    { id: 'experience', label: 'Experience', icon: Zap       },
-    { id: 'skills',     label: 'Tech Stack', icon: Cpu       },
-    { id: 'education',  label: 'Contact',    icon: Mail      },
+    { id: 'summary',    label: 'About',       icon: User      },
+    { id: 'projects',   label: 'Projects',    icon: Briefcase },
+    { id: 'experience', label: 'Experience',  icon: Zap       },
+    { id: 'skills',     label: 'Tech Stack',  icon: Cpu       },
+    { id: 'education',  label: 'Contact',     icon: Mail      },
   ];
 
   // ─── Render ──────────────────────────────────────────────────────────────────
   return (
     <section
       id="hero"
-      className="relative min-h-screen flex flex-col lg:flex-row bg-game-darker overflow-hidden"
+      className="relative h-screen flex flex-col lg:flex-row bg-game-darker overflow-hidden"
     >
-      {/* Full-section scanlines */}
+      {/* Scanlines */}
       <div className="absolute inset-0 scanlines opacity-20 pointer-events-none z-50" />
 
-      {/* ═══════════════════════════════════════════════════════════════════════
-          LEFT — Radar / sonar display
-      ═══════════════════════════════════════════════════════════════════════ */}
-      <div className="flex-1 flex items-center justify-center p-6 pt-24 lg:pt-10 lg:px-10">
-        {/* Outer glow ring (CSS, not canvas) */}
-        <div className="relative flex items-center justify-center w-full">
-          {/* Pulse rings behind the radar */}
+      {/* ═══════════════════════════════════════════════════════════════
+          LEFT — Radar display
+      ═══════════════════════════════════════════════════════════════ */}
+      <div className="flex-1 flex items-center justify-center p-4 pt-20 lg:pt-6 lg:p-10 overflow-hidden">
+        <div className="relative flex items-center justify-center w-full h-full">
+
+          {/* Pulse rings */}
           {[0, 1, 2].map((i) => (
             <motion.div
               key={i}
-              className="absolute rounded-full border border-primary-500/15"
-              style={{ width: '100%', maxWidth: 540, aspectRatio: '1' }}
-              animate={{ scale: [1, 1.04 + i * 0.04], opacity: [0.35, 0] }}
-              transition={{ duration: 3, repeat: Infinity, delay: i * 1, ease: 'easeOut' }}
+              className="absolute rounded-full border border-primary-500/10 pointer-events-none"
+              style={{ width: '100%', aspectRatio: '1', maxWidth: '100%', maxHeight: '100%' }}
+              animate={{ scale: [1, 1.04 + i * 0.03], opacity: [0.3, 0] }}
+              transition={{ duration: 3.2, repeat: Infinity, delay: i * 1.05, ease: 'easeOut' }}
             />
           ))}
 
-          {/* Radar circle container */}
+          {/* Radar circle */}
           <div
             ref={radarRef}
-            className="relative w-full aspect-square overflow-hidden rounded-full"
-            style={{ maxWidth: 'min(90vw, 500px, 80vh)' }}
+            className="relative rounded-full overflow-hidden"
+            style={{
+              width:       'min(100%, calc(100vh - 140px))',
+              height:      'min(100%, calc(100vh - 140px))',
+              aspectRatio: '1 / 1',
+            }}
           >
-            {/* ── Project images / videos (sector-clipped, always playing) ── */}
-            {sectors.map((s) => (
-              s.videoUrl ? (
+            {/* Sector images — each independently cycles through projects */}
+            {SECTOR_ANGLES.map((s, i) => {
+              const proj = allFeatured[sectorProjIdx[i] % allFeatured.length];
+              if (!proj) return null;
+              return proj.videoUrl ? (
                 <video
-                  key={s.id}
-                  src={s.videoUrl}
-                  poster={s.poster}
-                  muted
-                  loop
-                  playsInline
-                  autoPlay
-                  preload="metadata"
+                  key={`${i}-${sectorProjIdx[i]}`}
+                  src={proj.videoUrl}
+                  poster={proj.images[0]}
+                  muted loop playsInline autoPlay preload="metadata"
                   className="absolute inset-0 w-full h-full object-cover"
-                  style={{ clipPath: sectorPolygon(s.startDeg, s.endDeg) }}
+                  style={{ clipPath: SECTOR_CLIPS[i] }}
                 />
               ) : (
                 <img
-                  key={s.id}
-                  src={s.poster}
-                  alt={s.label}
+                  key={`${i}-${sectorProjIdx[i]}`}
+                  src={proj.images[0]}
+                  alt={proj.title}
                   className="absolute inset-0 w-full h-full object-cover"
-                  style={{ clipPath: sectorPolygon(s.startDeg, s.endDeg) }}
+                  style={{ clipPath: SECTOR_CLIPS[i] }}
                 />
-              )
-            ))}
+              );
+            })}
 
-            {/* ── Canvas: dark overlay + sweep punch + grid + arm ── */}
-            <canvas
-              ref={canvasRef}
-              className="absolute inset-0 w-full h-full"
-            />
+            {/* Canvas — dark overlay + sweep punch + grid + arm */}
+            <canvas ref={canvasRef} className="absolute inset-0 w-full h-full" />
           </div>
 
-          {/* Outer border ring (on top of everything) */}
+          {/* Glowing border ring */}
           <div
-            className="absolute rounded-full border-2 border-primary-500/50 pointer-events-none"
+            className="absolute rounded-full border-2 border-primary-500/40 pointer-events-none"
             style={{
-              width: 'min(90vw, 500px, 80vh)',
-              aspectRatio: '1',
-              boxShadow: '0 0 24px rgba(0,240,255,0.12), inset 0 0 24px rgba(0,240,255,0.05)',
+              width:  'min(100%, calc(100vh - 140px))',
+              height: 'min(100%, calc(100vh - 140px))',
+              boxShadow: '0 0 32px rgba(0,240,255,0.10), inset 0 0 32px rgba(0,240,255,0.04)',
             }}
           />
 
           {/* SCANNING label */}
-          <div className="absolute top-3 left-1/2 -translate-x-1/2 flex items-center gap-1.5 z-10 pointer-events-none">
+          <div className="absolute top-2 left-1/2 -translate-x-1/2 flex items-center gap-1.5 z-10 pointer-events-none">
             <motion.div
-              animate={{ opacity: [1, 0.15, 1] }}
+              animate={{ opacity: [1, 0.1, 1] }}
               transition={{ duration: 1.1, repeat: Infinity }}
               className="w-1.5 h-1.5 rounded-full bg-neon-green"
             />
@@ -400,14 +392,15 @@ export default function TacticalHero() {
       </div>
 
       {/* Vertical divider */}
-      <div className="hidden lg:block w-px bg-gradient-to-b from-transparent via-primary-500/25 to-transparent shrink-0" />
+      <div className="hidden lg:block w-px bg-gradient-to-b from-transparent via-primary-500/20 to-transparent shrink-0" />
 
-      {/* ═══════════════════════════════════════════════════════════════════════
+      {/* ═══════════════════════════════════════════════════════════════
           RIGHT — Command panel
-      ═══════════════════════════════════════════════════════════════════════ */}
-      <div className="lg:w-[360px] xl:w-[400px] shrink-0 flex flex-col border-t lg:border-t-0 border-primary-500/20 bg-gradient-to-b from-game-card/40 to-game-darker/80">
+      ═══════════════════════════════════════════════════════════════ */}
+      <div className="lg:w-[340px] xl:w-[380px] shrink-0 flex flex-col border-t lg:border-t-0 border-primary-500/15 bg-gradient-to-b from-game-card/35 to-game-darker/70 overflow-y-auto">
+
         {/* Navbar spacer */}
-        <div className="h-20 shrink-0 border-b border-primary-500/10 flex items-end px-6 pb-2">
+        <div className="h-24 shrink-0 border-b border-primary-500/10 flex items-end px-6 pb-2">
           <div className="flex items-center gap-2">
             <Radio size={11} className="text-neon-green" />
             <span className="font-mono text-[10px] text-neon-green uppercase tracking-widest">
@@ -416,19 +409,17 @@ export default function TacticalHero() {
           </div>
         </div>
 
-        <div className="flex flex-col gap-5 px-6 py-5 overflow-y-auto flex-1">
+        <div className="flex flex-col gap-5 px-6 py-5">
 
           {/* ── Operator profile ── */}
           <div>
-            <span className="font-mono text-[10px] text-primary-500/50 uppercase tracking-widest">
+            <span className="font-mono text-[10px] text-primary-500/45 uppercase tracking-widest">
               Operator Profile
             </span>
-
             <h1 className="mt-2 text-3xl font-bold font-game text-white leading-tight relative inline-block">
               <span className="relative z-10">
                 {personalInfo.name.split(' ').slice(0, 2).join(' ')}
               </span>
-              {/* Glitch layers */}
               <span
                 className="absolute inset-0 text-primary-400 opacity-50 animate-glitch"
                 aria-hidden
@@ -447,13 +438,11 @@ export default function TacticalHero() {
             <div className="text-lg font-bold font-game text-primary-400 text-glow">
               {personalInfo.name.split(' ').slice(2).join(' ')}
             </div>
-
-            <div className="mt-2 h-5 overflow-hidden">
+            <div className="mt-1.5 h-5 overflow-hidden">
               <motion.div
                 key={titleIndex}
-                initial={{ y: 16, opacity: 0 }}
+                initial={{ y: 14, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
-                exit={{ y: -16, opacity: 0 }}
                 transition={{ duration: 0.3 }}
                 className="font-mono text-xs text-gray-500 uppercase tracking-widest flex items-center gap-1.5"
               >
@@ -463,12 +452,11 @@ export default function TacticalHero() {
             </div>
           </div>
 
-          {/* Divider */}
           <div className="h-px bg-gradient-to-r from-primary-500/20 to-transparent" />
 
           {/* ── Navigation ── */}
           <div>
-            <span className="font-mono text-[10px] text-primary-500/50 uppercase tracking-widest mb-2 block">
+            <span className="font-mono text-[10px] text-primary-500/45 uppercase tracking-widest mb-2 block">
               Navigation
             </span>
             <nav className="flex flex-col gap-0.5">
@@ -478,135 +466,97 @@ export default function TacticalHero() {
                   onClick={() => scrollTo(id)}
                   whileHover={{ x: 5 }}
                   whileTap={{ scale: 0.97 }}
-                  className="group flex items-center gap-3 px-3 py-2.5 border border-transparent hover:border-primary-500/30 hover:bg-primary-500/5 transition-all duration-150 text-left"
+                  className="group flex items-center gap-3 px-3 py-2.5 border border-transparent hover:border-primary-500/25 hover:bg-primary-500/[0.04] transition-all duration-150 text-left"
                 >
-                  <Icon
-                    size={13}
-                    className="text-primary-500/40 group-hover:text-primary-400 transition-colors shrink-0"
-                  />
+                  <Icon size={13} className="text-primary-500/35 group-hover:text-primary-400 transition-colors shrink-0" />
                   <span className="font-mono text-sm text-gray-500 group-hover:text-gray-200 uppercase tracking-widest transition-colors flex-1">
                     {label}
                   </span>
-                  <span className="font-mono text-xs text-primary-500/0 group-hover:text-primary-500/50 transition-colors">
-                    ▶
-                  </span>
+                  <span className="font-mono text-xs text-transparent group-hover:text-primary-500/45 transition-colors">▶</span>
                 </motion.button>
               ))}
             </nav>
           </div>
 
-          {/* Divider */}
           <div className="h-px bg-gradient-to-r from-primary-500/20 to-transparent" />
 
-          {/* ── Active feeds ── */}
+          {/* ── Active feeds (DOM-updated, no per-frame re-render) ── */}
           <div>
-            <span className="font-mono text-[10px] text-primary-500/50 uppercase tracking-widest mb-2 block">
+            <span className="font-mono text-[10px] text-primary-500/45 uppercase tracking-widest mb-2 block">
               Active Feeds
             </span>
             <div className="flex flex-col gap-1.5">
-              {sectors.map((s, i) => {
-                const isActive = activeSectorIdx === i;
-                return (
-                  <motion.div
-                    key={s.id}
-                    animate={isActive ? { opacity: 1 } : { opacity: 0.45 }}
-                    transition={{ duration: 0.3 }}
-                    className="flex items-center gap-3 px-3 py-2 border transition-colors duration-300"
-                    style={{
-                      borderColor: isActive ? `${s.color}55` : `${s.color}18`,
-                      backgroundColor: isActive ? `${s.color}08` : 'transparent',
-                    }}
-                  >
-                    <span className="font-mono text-[10px] text-gray-600 w-5 shrink-0">
-                      {String(i + 1).padStart(2, '0')}
-                    </span>
-                    <motion.div
-                      animate={isActive
-                        ? { opacity: [1, 0.3, 1], boxShadow: [`0 0 4px ${s.color}`, `0 0 10px ${s.color}`, `0 0 4px ${s.color}`] }
-                        : { opacity: 0.4 }}
-                      transition={{ duration: 0.8, repeat: isActive ? Infinity : 0 }}
-                      className="w-2 h-2 rounded-full shrink-0"
-                      style={{ backgroundColor: s.color }}
-                    />
-                    <div className="flex-1 min-w-0">
-                      <div
-                        className="font-mono text-xs font-semibold uppercase tracking-wider truncate"
-                        style={{ color: isActive ? s.color : `${s.color}88` }}
-                      >
-                        {s.label}
-                      </div>
-                      <div className="font-mono text-[10px] text-gray-600 truncate">
-                        {s.tech} · {s.startDeg}°–{s.endDeg}°
-                      </div>
+              {SECTOR_ANGLES.map((s, i) => (
+                <div
+                  key={i}
+                  ref={(el) => { if (el) feedElemsRef.current[i] = el; }}
+                  className="flex items-center gap-3 px-3 py-2 border transition-all duration-300
+                    opacity-35
+                    data-[active=true]:opacity-100"
+                  style={{ borderColor: `${s.color}18` }}
+                >
+                  <span className="font-mono text-[10px] text-gray-600 w-5 shrink-0">
+                    {String(i + 1).padStart(2, '0')}
+                  </span>
+                  <div
+                    className="w-2 h-2 rounded-full shrink-0"
+                    style={{ backgroundColor: `${s.color}55` }}
+                  />
+                  <div className="flex-1 min-w-0">
+                    {/* Label text updated directly by canvas draw via sectorLabelsRef */}
+                    <div
+                      className="font-mono text-xs font-semibold uppercase tracking-wider truncate"
+                      style={{ color: `${s.color}80` }}
+                    >
+                      {allFeatured[sectorProjIdx[i] % allFeatured.length]?.title ?? '—'}
                     </div>
-                    {isActive && (
-                      <motion.span
-                        animate={{ opacity: [1, 0, 1] }}
-                        transition={{ duration: 0.6, repeat: Infinity }}
-                        className="font-mono text-[10px] shrink-0"
-                        style={{ color: s.color }}
-                      >
-                        LIVE
-                      </motion.span>
-                    )}
-                  </motion.div>
-                );
-              })}
+                    <div className="font-mono text-[10px] text-gray-600 truncate">
+                      {SECTOR_ANGLES[i].startDeg}°–{SECTOR_ANGLES[i].endDeg}°
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
 
-          {/* Divider */}
           <div className="h-px bg-gradient-to-r from-primary-500/20 to-transparent" />
 
           {/* ── CTAs ── */}
           <div className="flex flex-col gap-2">
             <motion.a
               href="https://raw.githubusercontent.com/aleql/portafolio-aql/main/public/cv.pdf"
-              target="_blank"
-              rel="noopener noreferrer"
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.97 }}
+              target="_blank" rel="noopener noreferrer"
+              whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}
               className="flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-primary-600 to-accent-600 font-mono font-semibold text-sm uppercase tracking-wider text-white corner-cut"
             >
-              <FileDown size={15} />
-              Download CV
+              <FileDown size={14} /> Download CV
             </motion.a>
-
             <motion.a
               href="#/aleql-gamedev"
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.97 }}
+              whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}
               className="flex items-center justify-center gap-2 px-4 py-3 border-2 border-accent-500/50 hover:border-accent-400 font-mono font-semibold text-sm uppercase tracking-wider text-accent-400 transition-colors corner-cut"
             >
-              <Gamepad2 size={15} />
-              Game CV
+              <Gamepad2 size={14} /> Game CV
             </motion.a>
-
             <motion.button
               onClick={() => scrollTo('projects')}
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.97 }}
-              className="flex items-center justify-center gap-2 px-4 py-2.5 border border-primary-500/30 hover:border-primary-500/60 font-mono text-sm uppercase tracking-wider text-primary-500 hover:text-primary-400 transition-colors corner-cut"
+              whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}
+              className="flex items-center justify-center gap-2 px-4 py-2.5 border border-primary-500/30 hover:border-primary-500/55 font-mono text-sm uppercase tracking-wider text-primary-500 hover:text-primary-400 transition-colors corner-cut"
             >
-              <Code2 size={14} />
-              View Projects
+              <Code2 size={14} /> View Projects
             </motion.button>
           </div>
 
-          {/* Bottom stats */}
-          <div className="flex gap-4 mt-auto pt-2 border-t border-primary-500/10">
+          {/* ── Stats ── */}
+          <div className="flex gap-4 pt-2 border-t border-primary-500/10">
             {[
-              { value: '50+', label: 'Projects' },
-              { value: '10Y+', label: 'Experience' },
-              { value: '25+', label: 'Technologies' },
+              { value: '50+',  label: 'Projects'     },
+              { value: '10Y+', label: 'Experience'   },
+              { value: '25+',  label: 'Technologies' },
             ].map((s) => (
               <div key={s.label} className="flex-1 text-center">
-                <div className="font-mono text-lg font-bold text-primary-400 text-glow leading-none">
-                  {s.value}
-                </div>
-                <div className="font-mono text-[10px] text-gray-600 uppercase tracking-wider mt-0.5">
-                  {s.label}
-                </div>
+                <div className="font-mono text-lg font-bold text-primary-400 text-glow leading-none">{s.value}</div>
+                <div className="font-mono text-[10px] text-gray-600 uppercase tracking-wider mt-0.5">{s.label}</div>
               </div>
             ))}
           </div>
@@ -625,10 +575,7 @@ export default function TacticalHero() {
         aria-label="Scroll to content"
         className="absolute bottom-5 left-1/2 lg:left-[32%] -translate-x-1/2 text-primary-500 hover:text-primary-400 transition-colors z-10"
       >
-        <ChevronDown
-          size={26}
-          className="drop-shadow-[0_0_8px_rgba(0,240,255,0.7)]"
-        />
+        <ChevronDown size={26} className="drop-shadow-[0_0_8px_rgba(0,240,255,0.7)]" />
       </motion.button>
     </section>
   );
