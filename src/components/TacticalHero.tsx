@@ -307,7 +307,7 @@ export default function TacticalHero() {
   return (
     <section
       id="hero"
-      className="relative h-screen flex flex-col lg:flex-row bg-game-darker overflow-hidden"
+      className="relative min-h-screen lg:h-screen flex flex-col lg:flex-row bg-game-darker overflow-x-hidden lg:overflow-hidden"
     >
       {/* Scanlines */}
       <div className="absolute inset-0 scanlines opacity-20 pointer-events-none z-50" />
@@ -315,7 +315,7 @@ export default function TacticalHero() {
       {/* ═══════════════════════════════════════════════════════════════
           LEFT — Radar display
       ═══════════════════════════════════════════════════════════════ */}
-      <div className="flex-1 flex items-center justify-center p-4 pt-20 lg:pt-6 lg:p-10 overflow-hidden">
+      <div className="flex-none h-[min(100vw,80vh)] lg:flex-1 lg:h-auto flex items-center justify-center p-4 pt-20 lg:pt-6 lg:p-10 overflow-hidden">
         <div className="relative flex items-center justify-center w-full h-full">
 
           {/* Pulse rings */}
@@ -335,7 +335,6 @@ export default function TacticalHero() {
             className="relative rounded-full overflow-hidden"
             style={{
               width:       'min(100%, calc(100vh - 140px))',
-              height:      'min(100%, calc(100vh - 140px))',
               aspectRatio: '1 / 1',
             }}
           >
@@ -371,8 +370,8 @@ export default function TacticalHero() {
           <div
             className="absolute rounded-full border-2 border-primary-500/40 pointer-events-none"
             style={{
-              width:  'min(100%, calc(100vh - 140px))',
-              height: 'min(100%, calc(100vh - 140px))',
+              width:     'min(100%, calc(100vh - 140px))',
+              aspectRatio: '1 / 1',
               boxShadow: '0 0 32px rgba(0,240,255,0.10), inset 0 0 32px rgba(0,240,255,0.04)',
             }}
           />
