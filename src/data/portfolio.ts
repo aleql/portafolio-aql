@@ -33,6 +33,7 @@ export interface Project {
   githubUrl?: string;
   featured: boolean;
   images: string[];
+  videoUrl?: string; // Optional: path to a short looping game clip, e.g. '/videos/eye-search.mp4'
   highlights?: string[];
   duration?: string;
   hidden?: boolean;

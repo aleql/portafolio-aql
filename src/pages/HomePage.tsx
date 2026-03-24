@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import Navigation from '../components/Navigation';
-import Hero from '../components/Hero';
+import Hero from '../components/TacticalHero';
 import Summary from '../components/Summary';
 import Projects from '../components/Projects';
 import Experience from '../components/Experience';
