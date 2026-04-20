@@ -24,9 +24,9 @@ export default function Footer() {
             )}
           </div>
         </div>
-        <div className="site-footer">
+        {/* <div className="site-footer">
           // END OF TRANSMISSION // AQL.CMD // BUILD 26.04 // {new Date().getFullYear()}
-        </div>
+        </div> */}
       </section>
     </>
   );

@@ -295,18 +295,71 @@ export default function Radar({ size = 520, onActivePing, activeSectorKey, proje
           // Calculate fade based on distance from sweep
           const fadeAlpha = 1 - Math.abs(d) / SHOW_RANGE;
 
-          // Draw image with size and border
-          const imgSize = R * 0.5; // 50% of radar radius (twice the original size)
+          // Draw image as a circular sector/wedge emanating from radar center
+          const sectorAngle = 50 * Math.PI / 180; // 50 degree wedge
+          const innerRadius = R * (blip.dist - 0.25); // Start closer to center
+          const outerRadius = R * (blip.dist + 0.25); // Extend outward
+
+          ctx.save();
+          ctx.globalAlpha = fadeAlpha * 0.85;
+
+          // Create wedge/sector clipping path from radar center
+          ctx.beginPath();
+          ctx.moveTo(cx, cy); // Start at radar center (apex)
+          ctx.arc(cx, cy, outerRadius, a - sectorAngle / 2, a + sectorAngle / 2);
+          ctx.lineTo(cx, cy); // Close back to center
+          ctx.closePath();
+          ctx.clip();
+
+          // Draw image centered at blip position to fill the sector
+          const imgSize = outerRadius * 1.2;
+          ctx.drawImage(img, bx - imgSize / 2, by - imgSize / 2, imgSize, imgSize);
+
+          ctx.restore();
+
+          // Draw glowing sector border
           ctx.save();
           ctx.globalAlpha = fadeAlpha * 0.9;
+          const sectorColor = SECTORS.find(x => x.key === blip.sector)?.color || '#44d4c2';
 
-          // Border
-          ctx.strokeStyle = SECTORS.find(x => x.key === blip.sector)?.color || '#44d4c2';
+          // Outer glow on arc
+          ctx.strokeStyle = sectorColor;
+          ctx.lineWidth = 3;
+          ctx.shadowColor = sectorColor;
+          ctx.shadowBlur = 15;
+          ctx.beginPath();
+          ctx.arc(cx, cy, outerRadius, a - sectorAngle / 2, a + sectorAngle / 2);
+          ctx.stroke();
+
+          // Glow on radial edges from center
+          ctx.beginPath();
+          ctx.moveTo(cx, cy);
+          ctx.lineTo(cx + outerRadius * Math.cos(a - sectorAngle / 2), cy + outerRadius * Math.sin(a - sectorAngle / 2));
+          ctx.moveTo(cx, cy);
+          ctx.lineTo(cx + outerRadius * Math.cos(a + sectorAngle / 2), cy + outerRadius * Math.sin(a + sectorAngle / 2));
+          ctx.stroke();
+
+          // Inner arc highlight
+          ctx.shadowBlur = 8;
           ctx.lineWidth = 2;
-          ctx.strokeRect(bx - imgSize / 2, by - imgSize / 2, imgSize, imgSize);
+          ctx.strokeStyle = 'rgba(255, 255, 255, 0.6)';
+          ctx.beginPath();
+          ctx.arc(cx, cy, innerRadius, a - sectorAngle / 2, a + sectorAngle / 2);
+          ctx.stroke();
 
-          // Image
-          ctx.drawImage(img, bx - imgSize / 2, by - imgSize / 2, imgSize, imgSize);
+          ctx.restore();
+
+          // Add radar scan line from center to blip
+          ctx.save();
+          ctx.globalAlpha = fadeAlpha * 0.4;
+          ctx.beginPath();
+          ctx.moveTo(cx, cy);
+          ctx.lineTo(bx, by);
+          ctx.strokeStyle = 'rgba(180, 255, 240, 0.6)';
+          ctx.lineWidth = 1.5;
+          ctx.shadowColor = '#44d4c2';
+          ctx.shadowBlur = 8;
+          ctx.stroke();
           ctx.restore();
         }
       }
