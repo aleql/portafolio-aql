@@ -58,7 +58,7 @@ function ProjectCard({ p, onOpen }: { p: any; onOpen: () => void }) {
     p.thumbnail ||
     p.cover ||
     p.heroImage ||
-    (p.slug ? `/portafolio-aql/projects/${p.slug}/gallery-1.png` : '');
+    (p.slug ? `/projects/${p.slug}/gallery-1.png` : '');
 
   const tag = p.tag || (p.technologies?.slice(0, 2).join(' / ') ?? '').toUpperCase();
   const year = p.year || p.duration || '';

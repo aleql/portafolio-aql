@@ -48,6 +48,11 @@ export interface Education {
   focus?: string[];
 }
 
+export interface Stat {
+  value: string;
+  label: string;
+}
+
 export interface Skill {
   category: string;
   items: string[];
@@ -77,6 +82,14 @@ export const personalInfo: PersonalInfo = {
 
 // Professional Summary
 export const professionalSummary = "Senior Full-Stack and Backend Engineer with more than ten years of experience building scalable, production-grade systems across AI-driven web platforms, data-intensive pipelines, and game development. Strong background in Unity gameplay systems, backend architecture, distributed systems, and optimization workflows. Experienced Human-Computer Interaction researcher with academic publications and long-term research collaborations in serious games and therapeutic applications. Proven ability to lead technical initiatives, collaborate with multidisciplinary teams, and deliver robust systems using modern cloud infrastructure and CI/CD practices.";
+
+// Hero statistics
+export const stats: Stat[] = [
+  { value: '10+', label: 'Years Active' },
+  { value: '25+', label: 'Shipped Projects' },
+  { value: '5',   label: 'Live Therapies' },
+  { value: '3',   label: 'Research Roles' },
+];
 
 export const coreStrengths = [
   "Backend architecture and scalable systems",
@@ -208,7 +221,7 @@ export const experiences: Experience[] = [
     company: "GERO Institute",
     role: "Game Developer",
     period: "Jul 2017 - Dec 2017",
-    location: "Chile-London UK",
+    location: "Chile",
     description: [
       "Developed serious video games focused on Alzheimer's disease prevention",
       "Worked on Sinapp, an educational game promoting healthy cognitive habits through gameplay systems"
@@ -231,6 +244,54 @@ export const experiences: Experience[] = [
 // Notable Projects
 export const projects: Project[] = [
   {
+    title: "Claws & Cue Balls",
+    slug: "claws-cue-balls",
+    subtitle: "Roguelike Billiards with Noir Cat-Mafia Aesthetic",
+    description: "Roguelike billiards game with a noir cat-mafia aesthetic where players navigate procedurally generated pool tables. Each run presents unique table layouts, trick shots, and strategic challenges.",
+    fullDescription: "Claws & Cue Balls combines the precision of billiards with the unpredictability of roguelike gameplay. Set in a stylized noir underworld run by cat mobsters, players must master increasingly complex pool table layouts filled with obstacles, power-ups, and environmental hazards. Each run generates new table configurations, requiring players to adapt their strategy and sharpen their shot-making skills under pressure.",
+    details: [
+      "Procedurally generated pool table layouts with unique obstacles and challenges",
+      "Noir cat-mafia aesthetic with hand-crafted character designs and atmospheric environments",
+      "Physics-based billiards mechanics with trick shot possibilities",
+      "Roguelike progression system with unlockable abilities and modifiers",
+      "Strategic depth through resource management and shot planning"
+    ],
+    role: ["Game Designer", "Gameplay Programmer", "Systems Designer"],
+    technologies: ["Unreal Engine 5.7", "C++", "Blueprint"],
+    featured: true,
+    images: [],
+    highlights: [
+      "Built with Unreal Engine 5.7 for next-gen visual fidelity",
+      "Unique fusion of billiards precision and roguelike unpredictability",
+      "Atmospheric noir aesthetic with feline crime family narrative"
+    ],
+    duration: "2025 - Q4 2026 (In Development)"
+  },
+  {
+    title: "Rock & Goblin",
+    slug: "rock-goblin",
+    subtitle: "Goblin-Driven Tower Defense with Mineral-Based Combat",
+    description: "Goblin-driven tower defense game with a unique mineral-based damage system where the right resource hits weaker foes harder. Command your goblin workforce to mine, craft, and defend against waves of enemies.",
+    fullDescription: "Rock & Goblin reimagines tower defense through a resource-driven combat system where different minerals and ores deal varying damage to different enemy types. Players must balance mining operations, tower construction, and strategic resource allocation while managing a chaotic workforce of goblins. The mineral-based damage system creates deep strategic choices as players discover which resources are most effective against each enemy type.",
+    details: [
+      "Mineral-based damage system with rock-paper-scissors style effectiveness",
+      "Goblin workforce management with AI-driven worker behavior",
+      "Resource extraction and tower crafting systems",
+      "Multiple enemy types requiring different mineral countermeasures",
+      "Strategic depth through resource prioritization and tower positioning"
+    ],
+    role: ["Game Designer", "Gameplay Programmer", "Systems Designer"],
+    technologies: ["Unity 6", "C#"],
+    featured: true,
+    images: [],
+    highlights: [
+      "Innovative mineral-based damage system",
+      "Deep resource management and tower defense fusion",
+      "Chaotic goblin workforce adds personality and challenge"
+    ],
+    duration: "2025 - Q1 2027 (In Development)"
+  },
+  {
     title: "Eye-Search",
     slug: "eye-search",
     subtitle: "Gamified Web-Based Therapy for Hemianopia",
@@ -248,9 +309,9 @@ export const projects: Project[] = [
     liveUrl: "https://eye-search.co.uk/",
     featured: true,
     images: [
-      "/projects/eye-search/gallery-1.png",
-      "/projects/eye-search/gallery-2.png",
-      "/projects/eye-search/gallery-3.png"
+      "/portafolio-aql/projects/eye-search/gallery-1.png",
+      "/portafolio-aql/projects/eye-search/gallery-2.png",
+      "/portafolio-aql/projects/eye-search/gallery-3.png"
     ],
     highlights: [
       "Published HCI research on gamification in therapeutic contexts",
@@ -275,7 +336,7 @@ export const projects: Project[] = [
     liveUrl: "https://readright.ucl.ac.uk/",
     featured: true,
     images: [
-      "/projects/readright/gallery-1.png",
+      "/portafolio-aql/projects/readright/gallery-1.png",
     ],
     highlights: [
       "Integration with clinical workflows",
@@ -300,8 +361,8 @@ export const projects: Project[] = [
     technologies: ["Unity 3D", "R", "Python"],
     featured: true,
     images: [
-      "/projects/coaniquem/gallery-1.png",
-      "/projects/coaniquem/gallery-2.png"
+      "/portafolio-aql/projects/coaniquem/gallery-1.png",
+      "/portafolio-aql/projects/coaniquem/gallery-2.png"
     ],
     highlights: [
       "VR-based social reintegration therapy",
@@ -321,8 +382,8 @@ export const projects: Project[] = [
     liveUrl: "https://alerce.science",
     featured: true,
     images: [
-      "/projects/alerce/gallery-1.png",
-      "/projects/alerce/gallery-2.png"
+      "/portafolio-aql/projects/alerce/gallery-1.png",
+      "/portafolio-aql/projects/alerce/gallery-2.png"
     ],
     highlights: [
       "Processes millions of astronomical alerts per night",
@@ -347,8 +408,8 @@ export const projects: Project[] = [
     technologies: ["Unity 3D"],
     featured: false,
     images: [
-      "/projects/sinapp/gallery-1.png",
-      "/projects/sinapp/gallery-2.png"
+      "/portafolio-aql/projects/sinapp/gallery-1.png",
+      "/portafolio-aql/projects/sinapp/gallery-2.png"
     ],
     highlights: [
       "Education through gameplay mechanics",
@@ -374,8 +435,8 @@ export const projects: Project[] = [
     liveUrl: "https://mdv.molbiol.ox.ac.uk",
     featured: false,
     images: [
-      "/projects/mdv/gallery-1.png",
-      "/projects/mdv/gallery-2.png",
+      "/portafolio-aql/projects/mdv/gallery-1.png",
+      "/portafolio-aql/projects/mdv/gallery-2.png",
     ],
     highlights: [
       "Multiome and spatial analysis capabilities",
@@ -401,7 +462,7 @@ export const projects: Project[] = [
     featured: false,
     hidden: true,
     images: [
-      "/projects/education-platform/gallery-1.png"
+      "/portafolio-aql/projects/education-platform/gallery-1.png"
     ],
     highlights: [
       "Microservices architecture",

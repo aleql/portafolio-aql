@@ -16,7 +16,8 @@
       "Bash(npm run dev:*)",
       "Bash(timeout:*)",
       "Bash(cd:*)",
-      "Bash(npx tsc:*)"
+      "Bash(npx tsc:*)",
+      "Bash(npm uninstall:*)"
     ]
   }
 }

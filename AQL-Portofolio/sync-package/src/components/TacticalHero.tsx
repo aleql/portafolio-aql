@@ -67,7 +67,7 @@ export default function TacticalHero({ onNav }: TacticalHeroProps) {
 
         <div className="topstrip-inner">
           <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-            <div className="nameplate">ALEJANDRO QUIJADA</div>
+            <div className="nameplate">AQL — OPERATOR CONSOLE</div>
             <div style={{ color: 'var(--bone-dim)', fontSize: 11, letterSpacing: '0.14em' }}>
               <span className="led teal blink" /> LINK {'{ACTIVE}'}
             </div>
@@ -172,10 +172,10 @@ export default function TacticalHero({ onNav }: TacticalHeroProps) {
                   <span>Download CV</span>
                   <span className="kbd">↓</span>
                 </a>
-                {/* <a className="bevel-btn danger" href={`mailto:${personalInfo.email}`}>
+                <a className="bevel-btn danger" href={`mailto:${personalInfo.email}`}>
                   <span>Transmit Message</span>
                   <span className="kbd">✉</span>
-                </a> */}
+                </a>
               </div>
 
               <div className="cmd-feed">

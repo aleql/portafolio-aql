@@ -15,8 +15,10 @@ export function useDarkMode() {
     const root = window.document.documentElement;
     if (isDark) {
       root.classList.add('dark');
+      root.setAttribute('data-theme', 'dark');
     } else {
       root.classList.remove('dark');
+      root.setAttribute('data-theme', 'light');
     }
     localStorage.setItem('darkMode', String(isDark));
   }, [isDark]);
