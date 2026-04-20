@@ -168,7 +168,7 @@ export default function TacticalHero({ onNav }: TacticalHeroProps) {
                   </button>
                 ))}
                 <div className="divider" />
-                <a className="bevel-btn primary" href="/cv.pdf" download>
+                <a className="bevel-btn primary" href="https://raw.githubusercontent.com/aleql/portafolio-aql/main/public/cv.pdf" target="_blank" rel="noopener noreferrer">
                   <span>Download CV</span>
                   <span className="kbd">↓</span>
                 </a>
