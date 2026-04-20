@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from 'react';
-import { personalInfo, stats } from '../data/portfolio';
+import { personalInfo, stats, projects } from '../data/portfolio';
 import { useDarkMode } from '../hooks/useDarkMode';
 import Radar, { SECTORS, PROJECT_BLIPS, type RadarBlip } from './hero/Radar';
 import Rivet from './hero/Rivet';
@@ -109,7 +109,7 @@ export default function TacticalHero({ onNav }: TacticalHeroProps) {
                 <span className="label-strip">TACTICAL SCAN · 360°</span>
               </div>
               <div className="radar-stage">
-                <Radar onActivePing={handlePing} activeSectorKey={activeSector} />
+                <Radar onActivePing={handlePing} activeSectorKey={activeSector} projects={projects} />
               </div>
 
               <div className="radar-chrome-label bottom left-align">
@@ -178,7 +178,7 @@ export default function TacticalHero({ onNav }: TacticalHeroProps) {
                 </a> */}
               </div>
 
-              <div className="cmd-feed">
+              {/* <div className="cmd-feed">
                 <div className="label-strip" style={{ marginBottom: 8 }}>ACTIVE FEED</div>
                 <div className="feed-list">
                   {feedLog.length === 0 && (
@@ -201,7 +201,7 @@ export default function TacticalHero({ onNav }: TacticalHeroProps) {
                     );
                   })}
                 </div>
-              </div>
+              </div> */}
             </div>
           </div>
         </div>
@@ -215,9 +215,8 @@ export default function TacticalHero({ onNav }: TacticalHeroProps) {
         <Rivet pos={{ bottom: 8, right: 8 }} />
         <div className="botstrip-inner">
           <div className="status-group"><span className="led green blink" /> <span className="mono">SYS NOMINAL</span></div>
-          <div className="status-group"><span className="led amber" /> <span className="mono">DISK 71%</span></div>
+          <div className="status-group"><span className="led amber" /> <span className="mono">STATUS ACTIVE</span></div>
           <div className="status-group"><span className="led teal blink-fast" /> <span className="mono">COMMS OPEN</span></div>
-          <div className="status-group"><span className="led red blink" /> <span className="mono">REC</span></div>
           <div className="status-spacer" />
           <div className="mono" style={{ color: 'var(--bone-dim)', fontSize: 10, letterSpacing: '0.2em' }}>
             AQL.CMD // build 26.04 // ©{new Date().getFullYear()} ALEJANDRO QUIJADA LEYTON

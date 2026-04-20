@@ -4,7 +4,7 @@ import SectionHead from './common/SectionHead';
 export default function Summary() {
   return (
     <section id="summary" className="section">
-      <SectionHead tag="01 / DOSSIER" title={<>ABOUT <span className="amberpart">OPERATOR</span></>} subtitle="Background briefing · 10+ years in service" />
+      <SectionHead tag="01 / DOSSIER" title={<>ABOUT <span className="amberpart">ME</span></>} subtitle="Background briefing · 10+ years in service" />
       <div className="about-grid">
         <div className="panel-inset about-card">
           <p>{professionalSummary}</p>

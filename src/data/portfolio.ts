@@ -259,7 +259,10 @@ export const projects: Project[] = [
     role: ["Game Designer", "Gameplay Programmer", "Systems Designer"],
     technologies: ["Unreal Engine 5.7", "C++", "Blueprint"],
     featured: true,
-    images: [],
+    images: [
+      "/portafolio-aql/projects/claws-cue-balls/gallery-1.png",
+      "/portafolio-aql/projects/claws-cue-balls/gallery-2.png"
+    ],
     highlights: [
       "Built with Unreal Engine 5.7 for next-gen visual fidelity",
       "Unique fusion of billiards precision and roguelike unpredictability",
@@ -282,7 +285,7 @@ export const projects: Project[] = [
     ],
     role: ["Game Designer", "Gameplay Programmer", "Systems Designer"],
     technologies: ["Unity 6", "C#"],
-    featured: true,
+    featured: false,
     images: [],
     highlights: [
       "Innovative mineral-based damage system",
@@ -433,7 +436,7 @@ export const projects: Project[] = [
     role: ["Full-Stack Developer"],
     technologies: ["React", "TypeScript", "Node.js", "Python", "Flask", "Apache Kafka", "PostgreSQL"],
     liveUrl: "https://mdv.molbiol.ox.ac.uk",
-    featured: false,
+    featured: true,
     images: [
       "/portafolio-aql/projects/mdv/gallery-1.png",
       "/portafolio-aql/projects/mdv/gallery-2.png",

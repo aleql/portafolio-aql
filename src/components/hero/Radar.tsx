@@ -24,18 +24,15 @@ export const SECTORS: RadarSector[] = [
 ];
 
 export const PROJECT_BLIPS: RadarBlip[] = [
-  { slug: 'bit-heroes', sector: 'game',      angle: 0,   dist: 0.72, title: 'Bit Heroes Quest' },
-  { slug: 'sinapp',     sector: 'game',      angle: 30,  dist: 0.55, title: 'Sinapp' },
-  { slug: 'coaniquem',  sector: 'game',      angle: 340, dist: 0.86, title: 'COANIQUEM' },
-  { slug: 'mdv',        sector: 'backend',   angle: 72,  dist: 0.82, title: 'MDV' },
-  { slug: 'alerce',     sector: 'backend',   angle: 110, dist: 0.65, title: 'ALeRCE' },
-  { slug: 'equifax',    sector: 'backend',   angle: 128, dist: 0.42, title: 'Equifax ETL' },
-  { slug: 'eye-search', sector: 'research',  angle: 175, dist: 0.88, title: 'Eye-Search' },
-  { slug: 'readright',  sector: 'research',  angle: 205, dist: 0.68, title: 'ReadRight' },
-  { slug: 'ucl-italk',  sector: 'research',  angle: 225, dist: 0.48, title: 'iTalk' },
-  { slug: 'rvere',      sector: 'fullstack', angle: 260, dist: 0.78, title: 'Rvere' },
-  { slug: 'oxford',     sector: 'fullstack', angle: 285, dist: 0.55, title: 'Oxford MDV UI' },
-  { slug: 'edu',        sector: 'fullstack', angle: 300, dist: 0.38, title: 'Edu Platform' },
+  { slug: 'claws-cue-balls', sector: 'game',      angle: 0,   dist: 0.72, title: 'Claws & Cue Balls' },
+  { slug: 'rock-goblin',     sector: 'game',      angle: 30,  dist: 0.55, title: 'Rock & Goblin' },
+  { slug: 'sinapp',          sector: 'game',      angle: 340, dist: 0.86, title: 'Sinapp' },
+  { slug: 'coaniquem',       sector: 'game',      angle: 15,  dist: 0.65, title: 'COANIQUEM' },
+  { slug: 'mdv',             sector: 'backend',   angle: 72,  dist: 0.82, title: 'MDV' },
+  { slug: 'alerce',          sector: 'backend',   angle: 110, dist: 0.65, title: 'ALeRCE' },
+  { slug: 'education-platform', sector: 'backend', angle: 128, dist: 0.42, title: 'Edu Platform' },
+  { slug: 'eye-search',      sector: 'research',  angle: 175, dist: 0.88, title: 'Eye-Search' },
+  { slug: 'readright',       sector: 'research',  angle: 205, dist: 0.68, title: 'ReadRight' },
 ];
 
 const SWEEP_DEG_PER_SEC = 32;
@@ -50,14 +47,20 @@ interface RadarProps {
   size?: number;
   onActivePing?: (blip: RadarBlip) => void;
   activeSectorKey?: string | null;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  projects?: any[];
 }
 
-export default function Radar({ size = 520, onActivePing, activeSectorKey }: RadarProps) {
+export default function Radar({ size = 520, onActivePing, activeSectorKey, projects = [] }: RadarProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const rafRef = useRef<number | undefined>(undefined);
   const sweepRef = useRef(0);
   const lastRef = useRef(0);
   const pingRef = useRef<Map<string, number>>(new Map());
+  const imageCache = useRef<Map<string, HTMLImageElement>>(new Map());
+  const selectedBlipsRef = useRef<string[]>([]);
+  const selectedImagesRef = useRef<Map<string, string>>(new Map()); // slug -> imageUrl
+  const lastSelectionTimeRef = useRef(0); // Track last selection time
 
   const draw = useCallback(() => {
     const canvas = canvasRef.current;
@@ -72,6 +75,54 @@ export default function Radar({ size = 520, onActivePing, activeSectorKey }: Rad
     const W = canvas.width, H = canvas.height;
     const cx = W / 2, cy = H / 2;
     const R = Math.min(W, H) / 2 - 6;
+
+    // Select 2 random blips every 10 seconds
+    const sweep = sweepRef.current;
+    const now = performance.now();
+    const TIME_BETWEEN_SELECTIONS = 10000; // 10 seconds
+
+    // Initialize or update selection every 10 seconds
+    if (now - lastSelectionTimeRef.current >= TIME_BETWEEN_SELECTIONS) {
+      lastSelectionTimeRef.current = now;
+      const shuffled = [...PROJECT_BLIPS].sort(() => Math.random() - 0.5);
+      const selected = shuffled.slice(0, 2);
+      selectedBlipsRef.current = selected.map(b => b.slug);
+
+      console.log('🎯 New selection (10s interval), selected blips:', selected.map(s => s.slug));
+
+      // Select gallery-1.png for each selected blip
+      selectedImagesRef.current.clear();
+      selected.forEach(blip => {
+        const project = projects.find(p => p.slug === blip.slug);
+        if (project) {
+          let imageUrl = '';
+          // Always use gallery-1.png (first image) if available
+          if (project.images && project.images.length > 0) {
+            imageUrl = project.images[0]; // Always use first image (gallery-1)
+          } else {
+            // Fallback to default gallery-1.png
+            imageUrl = `/portafolio-aql/projects/${blip.slug}/gallery-1.png`;
+          }
+          selectedImagesRef.current.set(blip.slug, imageUrl);
+          console.log('📷 Selected image for', blip.slug, ':', imageUrl);
+
+          // Preload image
+          if (!imageCache.current.has(imageUrl)) {
+            const img = new Image();
+            img.src = imageUrl;
+            img.onload = () => {
+              console.log('✅ Image loaded:', imageUrl);
+            };
+            img.onerror = () => {
+              console.error('❌ Image failed to load:', imageUrl);
+            };
+            imageCache.current.set(imageUrl, img);
+          }
+        } else {
+          console.warn('⚠️ No project found for slug:', blip.slug);
+        }
+      });
+    }
 
     ctx.clearRect(0, 0, W, H);
 
@@ -137,7 +188,6 @@ export default function Radar({ size = 520, onActivePing, activeSectorKey }: Rad
       }
     }
 
-    const sweep = sweepRef.current;
     const sweepRad = (sweep - 90) * Math.PI / 180;
     const trailRad = TRAIL_DEG * Math.PI / 180;
 
@@ -171,7 +221,6 @@ export default function Radar({ size = 520, onActivePing, activeSectorKey }: Rad
     ctx.fill();
     ctx.shadowBlur = 0;
 
-    const now = performance.now();
     PROJECT_BLIPS.forEach(b => {
       const d = diffDeg(b.angle, sweep);
       const prevD = diffDeg(b.angle, (sweep - SWEEP_DEG_PER_SEC * (16 / 1000) + 360) % 360);
@@ -220,7 +269,49 @@ export default function Radar({ size = 520, onActivePing, activeSectorKey }: Rad
         ctx.globalAlpha = 1;
       }
     });
-  }, [onActivePing, activeSectorKey, size]);
+
+    // Draw images for selected blips when sweep is near
+    selectedBlipsRef.current.forEach(slug => {
+      const blip = PROJECT_BLIPS.find(b => b.slug === slug);
+      if (!blip) return;
+
+      const d = diffDeg(blip.angle, sweep);
+      const SHOW_RANGE = 45; // Show image when sweep is within 45 degrees
+
+      if (Math.abs(d) <= SHOW_RANGE) {
+        // Get pre-selected image URL for this blip
+        const imageUrl = selectedImagesRef.current.get(slug);
+        if (!imageUrl) {
+          console.warn('⚠️ No image URL for slug:', slug);
+          return;
+        }
+
+        const img = imageCache.current.get(imageUrl);
+        if (img && img.complete && img.naturalWidth > 0) {
+          const a = (blip.angle - 90) * Math.PI / 180;
+          const bx = cx + (R * blip.dist) * Math.cos(a);
+          const by = cy + (R * blip.dist) * Math.sin(a);
+
+          // Calculate fade based on distance from sweep
+          const fadeAlpha = 1 - Math.abs(d) / SHOW_RANGE;
+
+          // Draw image with size and border
+          const imgSize = R * 0.5; // 50% of radar radius (twice the original size)
+          ctx.save();
+          ctx.globalAlpha = fadeAlpha * 0.9;
+
+          // Border
+          ctx.strokeStyle = SECTORS.find(x => x.key === blip.sector)?.color || '#44d4c2';
+          ctx.lineWidth = 2;
+          ctx.strokeRect(bx - imgSize / 2, by - imgSize / 2, imgSize, imgSize);
+
+          // Image
+          ctx.drawImage(img, bx - imgSize / 2, by - imgSize / 2, imgSize, imgSize);
+          ctx.restore();
+        }
+      }
+    });
+  }, [onActivePing, activeSectorKey, size, projects]);
 
   useEffect(() => {
     const loop = (ts: number) => {
@@ -255,7 +346,7 @@ export default function Radar({ size = 520, onActivePing, activeSectorKey }: Rad
   }, []);
 
   return (
-    <div className="crt" style={{ width: size, height: size, position: 'relative' }}>
+    <div className="crt" style={{ width: '100%', height: '100%', maxWidth: size, maxHeight: size, position: 'relative', aspectRatio: '1/1' }}>
       <canvas ref={canvasRef} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }} />
     </div>
   );

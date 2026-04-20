@@ -20,7 +20,7 @@ function useIsDesktop() {
 
 export default function Projects() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const list = (projects as any[]).filter(p => !p.hidden).slice(0, 6);
+  const list = (projects as any[]).filter(p => p.featured && !p.hidden);
   const isDesktop = useIsDesktop();
   const navigate = useNavigate();
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -89,12 +89,11 @@ function ProjectCard({ p, onOpen }: { p: any; onOpen: () => void }) {
           {(p.technologies || []).slice(0, 6).map((t: string, i: number) => <span key={i} className="tech-pill">{t}</span>)}
         </div>
         <div className="proj-meta">
-          <span className="k">COORD</span><span>{coord}</span>
           <span className="k">ROLE</span><span>{(p.role || []).join(' · ')}</span>
         </div>
         <div className="proj-actions">
           {p.liveUrl && <a className="btn-sm primary" href={p.liveUrl} target="_blank" rel="noopener noreferrer">Live ↗</a>}
-          <button type="button" className="btn-sm" onClick={onOpen}>Briefing</button>
+          <button type="button" className="btn-sm" onClick={onOpen}>Details</button>
         </div>
       </div>
     </article>

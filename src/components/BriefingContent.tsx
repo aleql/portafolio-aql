@@ -30,13 +30,12 @@ export default function BriefingContent({ project, briefing, onClose, variant }:
         <div className="brief-head-left">
           <div className="brief-class">{briefing.classification}</div>
           <div className="mono" style={{ fontSize: 10, letterSpacing: '0.22em', color: 'var(--bone-dim)' }}>
-            DOSSIER · {project.slug?.toUpperCase()}
+            {project.slug?.toUpperCase()}
           </div>
         </div>
         <div className="brief-head-center">
           <h1 className="stencil brief-codename">{briefing.codename}</h1>
           <div className="mono" style={{ fontSize: 12, letterSpacing: '0.18em', color: 'var(--bone)' }}>
-            {project.title ?? project.slug}
           </div>
         </div>
         <div className="brief-head-right">
@@ -109,7 +108,7 @@ export default function BriefingContent({ project, briefing, onClose, variant }:
             <section>
               <div className="brief-section-head">
                 <h2 className="brief-section-title">
-                  § {String(briefing.sections.length + 2).padStart(2, '0')} · FIELD IMAGERY
+                  § {String(briefing.sections.length + 2).padStart(2, '0')} · Captures
                 </h2>
                 <div className="brief-section-bar" />
               </div>
@@ -173,7 +172,6 @@ export default function BriefingContent({ project, briefing, onClose, variant }:
 
       {/* FOOT */}
       <div className="brief-foot">
-        <span>// END OF DOSSIER //</span>
         <span>AQL.CMD · BUILD 26.04 · ©{new Date().getFullYear()}</span>
       </div>
     </>
