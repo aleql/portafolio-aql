@@ -4,7 +4,7 @@ import SectionHead from './common/SectionHead';
 export default function Experience() {
   return (
     <section id="experience" className="section">
-      <SectionHead tag="03 / DEPLOYMENT LOG" title={<>FIELD <span className="amberpart">EXPERIENCE</span></>} subtitle="Service record · chronological, newest first" />
+      <SectionHead tag="03 / Background LOG" title={<>EXPERIENCE <span className="amberpart"></span></>} subtitle="chronological, newest first" />
       <div className="timeline">
         {experiences.map((e, i) => (
           <div key={i} className="tl-item">

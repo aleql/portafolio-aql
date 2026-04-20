@@ -37,7 +37,7 @@ export default function Projects() {
 
   return (
     <section id="projects" className="section">
-      <SectionHead tag="02 / TARGETS" title={<>NOTABLE <span className="amberpart">PROJECTS</span></>} subtitle="Selected missions · therapy, games, data pipelines" />
+      {/* <SectionHead tag="02 / TARGETS" title={<>NOTABLE <span className="amberpart">PROJECTS</span></>} subtitle="Selected missions · therapy, games, data pipelines" /> */}
       <div className="projects-grid">
         {list.map((p, i) => <ProjectCard key={i} p={p} onOpen={() => openBriefing(p)} />)}
       </div>

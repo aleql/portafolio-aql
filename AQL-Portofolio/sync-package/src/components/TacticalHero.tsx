@@ -126,7 +126,7 @@ export default function TacticalHero({ onNav }: TacticalHeroProps) {
 
             <div className="operator panel-inset">
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-                <div className="label-strip">OPERATOR</div>
+                {/* <div className="label-strip">OPERATOR</div> */}
                 <div className="mono" style={{ color: 'var(--bone-dim)', fontSize: 10 }}>CLR-5 · RA2</div>
               </div>
               <h1 className="stencil" style={{ fontSize: 'clamp(24px, 2.2vw, 34px)', color: 'var(--bone)', margin: '10px 0 4px' }}>
