@@ -168,7 +168,7 @@ export default function TacticalHero({ onNav }: TacticalHeroProps) {
                   </button>
                 ))}
                 <div className="divider" />
-                <a className="bevel-btn primary" href="/cv.pdf" target="_blank" rel="noopener noreferrer">
+                <a className="bevel-btn primary" href="/cv.pdf" download>
                   <span>Download CV</span>
                   <span className="kbd">↓</span>
                 </a>
